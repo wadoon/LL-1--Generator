@@ -1,12 +1,12 @@
 import java.io.FileReader;
 import java.io.IOException;
 
-import weigl.grammer.compiler.OnTheFlyExecutor;
+import weigl.grammar.compiler.OnTheFlyCompiler;
 
 public class TestParserCompile {
 	public static void main(String[] args) throws IOException {
-		OnTheFlyExecutor otfe = new OnTheFlyExecutor();
-		Class<?> c = otfe.buildParserFor("weigl.grammar.genparsers.Parser", readIn("ClassTemplate.java"));
+		OnTheFlyCompiler otfe = new OnTheFlyCompiler();
+		Class<?> c = otfe.compile("weigl.grammar.genparsers.Parser", readIn("ClassTemplate.java"));
 		System.out.println(c.getCanonicalName());
 	}
 
