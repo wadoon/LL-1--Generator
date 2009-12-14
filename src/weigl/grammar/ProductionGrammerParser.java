@@ -1,5 +1,7 @@
 package weigl.grammar;
 
+import java.util.Map.Entry;
+
 import com.google.common.collect.*;
 
 /**
@@ -109,6 +111,9 @@ public class ProductionGrammerParser {
 	 */
 	public static String generateSource(String grammarRules) throws GrammarParserException {
 		ProductionGrammerParser pgp = new ProductionGrammerParser(grammarRules);
+		for (Entry<String, Replacement> e : pgp.productionRules.entries()) {
+			System.out.println(e.getKey() + " -> " + e.getValue());
+		}
 		return ParserBuilder.run(pgp.productionRules, pgp.firstSets);
 	}
 }

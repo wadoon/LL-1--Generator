@@ -22,7 +22,9 @@ public class Replacement implements Comparable<Replacement> {
 	 */
 	public Replacement(String line) {
 		String[] split = line
-				.split("((?<=[a-zA-Z])(?=[A-Z]))|((?<=[A-Z])(?=[a-z]))");
+//				.split("((?<=[a-zA-Z])(?=[A-Z]))|((?<=[A-Z])(?=[a-z]))");
+			//             split each UpperCase     split each lowerCase if upperCase
+				.split("((?<=.)(?=[A-Z]))|((?<=[A-Z])(?=[^A-Z]))");
 		tokens = new Token[split.length];
 		for (int i = 0; i < tokens.length; i++) {
 			if (Character.isUpperCase(split[i].charAt(0)))
