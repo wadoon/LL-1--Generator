@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- WARNING: Eclipse auto-generated file.
-              Any modifications will be overwritten.
-              To include a user specific buildfile here, simply create one in the same
-              directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. -->
 <project basedir="." default="build" name="LL(1)-Parser">
 	<property environment="env" />
-	<property name="ECLIPSE_HOME" value="../../../usr/eclipse/configuration/org.eclipse.rap.target-1.2/eclipse" />
 	<property name="debuglevel" value="source,lines,vars" />
 	<property name="target" value="1.6" />
 	<property name="source" value="1.6" />
-	<path id="LL(1)-Parser.classpath">
+	<property name="jar.file" value="ll1parser.jar" />
+
+	<path id="classpath">
 		<pathelement location="bin" />
 		<pathelement location="lib/google-collect-1.0-rc4.jar" />
+		<pathelement location="lib/jxlayer.jar" />
+		<pathelement location="lib/weigl_gui.jar" />
 	</path>
-	
+
 	<target name="init">
 		<mkdir dir="bin" />
 		<copy includeemptydirs="false" todir="bin">
@@ -24,62 +22,60 @@
 			</fileset>
 		</copy>
 	</target>
-	
+
 	<target name="clean">
 		<delete dir="bin" />
 	</target>
-	
+
 	<target depends="clean" name="cleanall" />
-	<target depends="build-subprojects,build-project" name="build" />
-	<target name="build-subprojects" />
+	<target depends="build-project" name="build" />
+
 	<target depends="init" name="build-project">
 		<echo message="${ant.project.name}: ${ant.file}" />
 		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
 			<src path="src" />
-			<classpath refid="LL(1)-Parser.classpath" />
+			<classpath refid="classpath" />
 		</javac>
-	</target>
-	<target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects" />
-	<target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
-		<copy todir="${ant.library.dir}">
-			<fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar" />
+		<copy todir="bin">
+			<fileset dir="src">
+				<include name="*" />
+				<exclude name="**.class" />
+			</fileset>
 		</copy>
-		<unzip dest="${ant.library.dir}">
-			<patternset includes="jdtCompilerAdapter.jar" />
-			<fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar" />
-		</unzip>
 	</target>
-	<target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
-		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter" />
-		<antcall target="build" />
+
+	<target name="jar" depends="build">
+		<jar destfile="$jar.file">
+			<fileset dir="bin">
+				<include name="**" />
+			</fileset>
+		</jar>
 	</target>
+
 	<target name="TestParserCompile">
 		<java classname="TestParserCompile" failonerror="true" fork="yes">
-			<classpath refid="LL(1)-Parser.classpath" />
+			<classpath refid="classpath" />
 		</java>
 	</target>
 	<target name="GrammarApplet">
 		<java classname="sun.applet.AppletViewer" dir="." failonerror="true" fork="yes">
 			<arg line="GrammarApplet.html" />
-			<classpath refid="LL(1)-Parser.classpath" />
+			<classpath refid="classpath" />
 		</java>
 	</target>
 	<target name="TestGrammar">
 		<java classname="TestGrammar" failonerror="true" fork="yes">
-			<classpath refid="LL(1)-Parser.classpath" />
+			<classpath refid="classpath" />
+		</java>
+	</target>
+	<target name="ExpressionGrammar">
+		<java classname="ExpressionGrammar" failonerror="true" fork="yes">
+			<classpath refid="classpath" />
 		</java>
 	</target>
 	<target name="Parser">
 		<java classname="Parser" failonerror="true" fork="yes">
-			<classpath refid="LL(1)-Parser.classpath" />
+			<classpath refid="classpath" />
 		</java>
-	</target>
-
-	<target name="jar">
-		<jar destfile="ll1_parser.jar">
-			<fileset file="bin/**">
-				<include name="bin/**"/>
-			</fileset>
-		</jar>
 	</target>
 </project>
