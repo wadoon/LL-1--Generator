@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -23,17 +24,17 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
-import org.jdesktop.jxlayer.JXLayer;
-import org.jdesktop.jxlayer.plaf.AbstractLayerUI;
 
 import weigl.grammar.GrammarParserException;
 import weigl.grammar.ParserWrapper;
 import weigl.grammar.ProductionGrammerParser;
-import weigl.grammar.gui.GrammarApplet.ErrorUI.State;
 import weigl.gui.LogListRenderer;
 import weigl.gui.LogListRenderer.Level;
 import weigl.gui.editor.EditorComponent;
@@ -52,23 +53,24 @@ import weigl.gui.editor.EditorScrollPane.Highlight;
 public class GrammarApplet extends JApplet {
 	private static final long serialVersionUID = -5382319120075825086L;
 
-	final String GRAMMAR_EXPRESSION = "E: TZ\n" + "Z: +TZ|€\n" + "T: FX\n"
-			+ "X: *X|€\n" + "F: (F)|I\n" + "I: aY|bY\n" + "Y: aY|bY|0Y|1Y|€";
+	static Color ERROR   = new Color(200, 0, 20).brighter().brighter();
+	static Color SUCCESS =  new Color(0, 200, 20);
+	
+	public static final String GRAMMAR_EXPRESSION = "E: TZ\n" + "Z: +TZ|€\n"
+			+ "T: FX\n" + "X: *X|€\n" + "F: (F)|I\n" + "I: aY|bY\n"
+			+ "Y: aY|bY|0Y|1Y|€";
 
 	private JTextArea txtGrammar = new JTextArea(GRAMMAR_EXPRESSION);
-	// private EditorScrollPane editGrammar = new EditorScrollPane(txtGrammar);
-	private JXLayer<EditorScrollPane> editGrammar = createLayer(new EditorScrollPane(
-			txtGrammar));
+	private EditorScrollPane editGrammar = new EditorScrollPane(txtGrammar);
 
 	private JButton btnCompile = new JButton("Compile");
 	private JButton btnJavaSource = new JButton("Show Java Source");
 
 	private JLabel lblInput = new JLabel("Eingabe: ");
-	private JXLayer<JTextField> txtInput;
+	private JTextField txtInput;
 
 	private JTree treeParse = new JTree(new Object[] {});
 
-	// private JTextArea txtLogging = new JTextArea();
 	private DefaultListModel lstLoggingModel = new DefaultListModel();
 	private JList lstLogging = new JList(lstLoggingModel);
 	private JScrollPane scrLogging = new JScrollPane(lstLogging);
@@ -77,20 +79,23 @@ public class GrammarApplet extends JApplet {
 
 	private JLabel lblLeafWord;
 
-	public final static String[] JAVA_KEYWORDS = { "if", "while", "private", "public",
-			"protected", "do", "void", "int", "double", "true", "else", "\\{", "\\}", "final", 
-			"false", "boolean", "float", "long", "for", "extends", "\\(","\\)", "import", "package",
-			"implements", "return", "class", "new", "volatile",
-			"transient", "try", "catch", "throws", "throw" };
-	
+	public final static String[] JAVA_KEYWORDS = { "if", "while", "private",
+			"public", "protected", "do", "void", "int", "double", "true",
+			"else", "\\{", "\\}", "final", "false", "boolean", "float", "long",
+			"for", "extends", "\\(", "\\)", "import", "package", "implements",
+			"return", "class", "new", "volatile", "transient", "try", "catch",
+			"throws", "throw" };
+
 	@Override
 	public void init() {
+		lookandfeel();
+
+		setLayout(new BorderLayout(5, 5));
+
 		LogListRenderer.install(lstLoggingModel);
-		setLayout(new BorderLayout());
 		lstLogging.setCellRenderer(new LogListRenderer());
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		add(split);
 
 		txtGrammar.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
 
@@ -105,7 +110,6 @@ public class GrammarApplet extends JApplet {
 
 		split.setLeftComponent(pWest);
 
-
 		btnJavaSource.addActionListener(new ActionListener() {
 
 			@Override
@@ -119,7 +123,7 @@ public class GrammarApplet extends JApplet {
 					ec.setKeywords(JAVA_KEYWORDS);
 					ec.addHighlight(new Highlight(new Color(250, 200, 0, 160),
 							JAVA_KEYWORDS));
-					frame.setSize(400,400);
+					frame.setSize(400, 400);
 					frame.setVisible(true);
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -134,8 +138,7 @@ public class GrammarApplet extends JApplet {
 			}
 		});
 
-		JTextField input = new JTextField(20);
-		txtInput = createLayer(input);
+		txtInput = new JTextField(20);
 
 		lblLeafWord = new JLabel("");
 
@@ -148,19 +151,10 @@ public class GrammarApplet extends JApplet {
 
 		pinput.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		input.getDocument().addDocumentListener(new DocumentListener() {
+		txtInput.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				change(e);
-			}
-
-			private void change(DocumentEvent e) {
-				try {
-					checkInput(e.getDocument().getText(0,
-							e.getDocument().getLength()));
-				} catch (BadLocationException e1) {
-					e1.printStackTrace();
-				}
 			}
 
 			@Override
@@ -172,6 +166,15 @@ public class GrammarApplet extends JApplet {
 			public void changedUpdate(DocumentEvent e) {
 				change(e);
 			}
+
+			private void change(DocumentEvent e) {
+				try {
+					checkInput(e.getDocument().getText(0,
+							e.getDocument().getLength()));
+				} catch (BadLocationException e1) {
+					e1.printStackTrace();
+				}
+			}
 		});
 
 		center.add(pinput, BorderLayout.NORTH);
@@ -179,10 +182,22 @@ public class GrammarApplet extends JApplet {
 		split.setRightComponent(center);
 
 		add(createBorder(scrLogging, "Logging"), BorderLayout.SOUTH);
+		add(split, BorderLayout.CENTER);
 
 		status("Welcome to another LL(1)-Parser factory");
 		status("Alexander Weigl <weigla@fh-trier.de> -- Dezember 2009");
-		status("Creates parser generators after the script in Theoretische Informatik!");
+		status("Creates parser generators after the script in theoretical computer science!");
+	}
+
+	private void lookandfeel() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//			UIManager
+			
+//					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private Component createGrid(JComponent... c) {
@@ -192,20 +207,12 @@ public class GrammarApplet extends JApplet {
 		return p;
 	}
 
-	public <T extends JComponent> JXLayer<T> createLayer(T component) {
-		JXLayer<T> layer = new JXLayer<T>(component, new ErrorUI<T>());
-		return layer;
+	public  void success(JComponent c) {
+		c.setBackground(SUCCESS);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <V extends JComponent> void success(JXLayer<V> c) {
-		ErrorUI<V> errorUI = (ErrorUI<V>) c.getUI();
-		errorUI.setState(State.SUCCESS);
-	}
-
-	@SuppressWarnings("unchecked")
-	public <V extends JComponent> void error(JXLayer<V> c) {
-		((ErrorUI<V>) c.getUI()).setState(State.ERROR);
+	public void error(JComponent c) {
+		c.setBackground(ERROR);
 	}
 
 	public void status(String line) {
@@ -267,7 +274,7 @@ public class GrammarApplet extends JApplet {
 					error(txtInput);
 					status("word mismatch!", Level.ERROR);
 				}
-
+				expandAll(treeParse, true);
 			} catch (IllegalStateException e) {
 				status("Input string is not well-known for the given grammar",
 						Level.ERROR);
@@ -281,38 +288,32 @@ public class GrammarApplet extends JApplet {
 		}
 	}
 
-	static class ErrorUI<V extends JComponent> extends AbstractLayerUI<V> {
-		private static final long serialVersionUID = -4855031847932047688L;
+	// If expand is true, expands all nodes in the tree.
+	// Otherwise, collapses all nodes in the tree.
+	public void expandAll(JTree tree, boolean expand) {
+		TreeNode root = (TreeNode) tree.getModel().getRoot();
 
-		private State currentState = State.NOTHING;
+		// Traverse tree from root
+		expandAll(tree, new TreePath(root), expand);
+	}
 
-		public static enum State {
-			SUCCESS, ERROR, NOTHING;
+	private void expandAll(JTree tree, TreePath parent, boolean expand) {
+		// Traverse children
+		TreeNode node = (TreeNode) parent.getLastPathComponent();
+		if (node.getChildCount() >= 0) {
+			for (Enumeration<?> e = node.children(); e.hasMoreElements();) {
+				TreeNode n = (TreeNode) e.nextElement();
+				TreePath path = parent.pathByAddingChild(n);
+				expandAll(tree, path, expand);
+			}
 		}
 
-		@Override
-		protected void paintLayer(Graphics2D g2, JXLayer<? extends V> l) {
-			super.paintLayer(g2, l);
-			if (currentState == State.NOTHING)
-				return;
-
-			Color cl;
-			if (currentState == State.ERROR)
-				cl = new Color(200, 0, 20, 50);
-			else
-				cl = new Color(0, 200, 20, 50);
-
-			g2 = (Graphics2D) g2.create();
-			g2.setColor(cl);
-			g2.fillRect(0, 0, l.getWidth(), l.getHeight());
-		}
-
-		public void setState(State currentState) {
-			this.currentState = currentState;
-		}
-
-		public State getState() {
-			return currentState;
+		// Expansion or collapse must be done bottom-up
+		if (expand) {
+			tree.expandPath(parent);
+		} else {
+			tree.collapsePath(parent);
 		}
 	}
+
 }

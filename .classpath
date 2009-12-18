@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="lib/google-collect-1.0-rc4.jar"/>
-	<classpathentry kind="lib" path="lib/jxlayer.jar" sourcepath="/home/alex/Downloads/jxlayer-src.zip"/>
 	<classpathentry kind="lib" path="lib/weigl_gui.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
