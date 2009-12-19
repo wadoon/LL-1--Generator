@@ -1,8 +1,9 @@
 package weigl.grammar;
 
+
 import java.io.IOException;
 
-import weigl.grammar.compiler.OnTheFlyCompiler;
+import weigl.tools.compiler.OnTheFlyCompiler;
 import weigl.grammar.rt.AST;
 import weigl.grammar.rt.Parser;
 import weigl.grammar.rt.ParserFather;

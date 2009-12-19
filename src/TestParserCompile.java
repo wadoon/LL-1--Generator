@@ -1,7 +1,8 @@
 import java.io.FileReader;
+
 import java.io.IOException;
 
-import weigl.grammar.compiler.OnTheFlyCompiler;
+import weigl.tools.compiler.OnTheFlyCompiler;
 
 public class TestParserCompile {
 	public static void main(String[] args) throws IOException {
