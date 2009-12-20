@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jnlp PUBLIC "-//Sun Microsystems, Inc//DTD Discriptor 6.0//EN" "http://java.sun.com/dtd/JNLP-6.0.dtd">
+<jnlp codebase="file:///home/alex/Projekte/02_ewsp/LL(1)-Parser/dist/">
+	<information>
+		<title>LL(1)-Parsergenerator</title>
+		<vendor>Alexander Weigl</vendor>
+		<homepage href="http://public.fh-trier.de/~weigla" />
+		<description>
+			Generate parser with abstract syntax tree parse from
+			grammar definition
+		</description>
+		<offline-allowed />
+	</information>
+
+	<security>
+		<all-permissions/>
+	</security>
+
+	<resources>
+		<java version="1.6+" />
+		<jar href="ll1parser.jar" main="true" />
+		<jar href="google-collect-1.0-rc4.jar"/>
+		<jar href="weigl_gui.jar" />
+		<jar href="weigl_tools.jar" />
+	</resources>
+
+	<application-desc  main-class="weigl.grammar.gui.GrammarProgram" />
+</jnlp>

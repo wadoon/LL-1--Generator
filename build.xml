@@ -5,12 +5,13 @@
 	<property name="target" value="1.6" />
 	<property name="source" value="1.6" />
 	<property name="jar.file" value="ll1parser.jar" />
+	<property name="dist.dir" location="dist" />
 
 	<path id="classpath">
-		<pathelement location="bin" />
 		<pathelement location="lib/google-collect-1.0-rc4.jar" />
 		<pathelement location="lib/jxlayer.jar" />
 		<pathelement location="lib/weigl_gui.jar" />
+		<pathelement location="lib/weigl_tools.jar" />
 	</path>
 
 	<target name="init">
@@ -45,37 +46,32 @@
 	</target>
 
 	<target name="jar" depends="build">
-		<jar destfile="$jar.file">
+		<jar destfile="${jar.file}">
 			<fileset dir="bin">
 				<include name="**" />
 			</fileset>
 		</jar>
+		<signjar alias="mykey" storepass="qweasd" verbose="true" jar="${jar.file}" />
 	</target>
 
-	<target name="TestParserCompile">
-		<java classname="TestParserCompile" failonerror="true" fork="yes">
-			<classpath refid="classpath" />
-		</java>
+	<!-- ================================= 
+          target: dist              
+         ================================= -->
+	<target name="dist" depends="jar" description="description">
+		<mkdir dir="${dist.dir}" />
+		<copy file="${jar.file}" todir="${dist.dir}">
+		</copy>
 	</target>
-	<target name="GrammarApplet">
-		<java classname="sun.applet.AppletViewer" dir="." failonerror="true" fork="yes">
-			<arg line="GrammarApplet.html" />
-			<classpath refid="classpath" />
-		</java>
-	</target>
-	<target name="TestGrammar">
-		<java classname="TestGrammar" failonerror="true" fork="yes">
-			<classpath refid="classpath" />
-		</java>
-	</target>
-	<target name="ExpressionGrammar">
-		<java classname="ExpressionGrammar" failonerror="true" fork="yes">
-			<classpath refid="classpath" />
-		</java>
-	</target>
-	<target name="Parser">
-		<java classname="Parser" failonerror="true" fork="yes">
-			<classpath refid="classpath" />
-		</java>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: signlibs                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="signlibs">
+		<copy todir="${dist.dir}">
+			<path refid="classpath" />
+		</copy>
+		<signjar alias="mykey" storepass="qweasd">
+			<path refid="classpath" />
+		</signjar>
 	</target>
 </project>

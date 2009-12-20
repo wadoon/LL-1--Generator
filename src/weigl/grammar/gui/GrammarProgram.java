@@ -2,20 +2,22 @@ package weigl.grammar.gui;
 
 import java.awt.BorderLayout;
 
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Enumeration;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -27,10 +29,6 @@ import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
 
 import weigl.grammar.GrammarParserException;
 import weigl.grammar.ParserWrapper;
@@ -50,16 +48,16 @@ import weigl.gui.editor.EditorScrollPane.Highlight;
  * @version 1
  * 
  */
-public class GrammarApplet extends JApplet {
+public class GrammarProgram extends JFrame {
 	private static final long serialVersionUID = -5382319120075825086L;
 
-	static Color ERROR   = new Color(200, 0, 20).brighter().brighter();
-	static Color SUCCESS =  new Color(0, 200, 20);
-	
-	public static final String GRAMMAR_EXPRESSION = "E: TZ\n" + "Z: +TZ|€\n"
-			+ "T: FX\n" + "X: *X|€\n" + "F: (F)|I\n" + "I: aY|bY\n"
-			+ "Y: aY|bY|0Y|1Y|€";
+	static Color ERROR = new Color(200, 0, 20).brighter().brighter();
+	static Color SUCCESS = new Color(0, 200, 20);
 
+	public static final String GRAMMAR_EXPRESSION = "E: TZ\n" + "Z: +TZ|€\n"
+			+ "T: FX\n" + "X: *FX|€\n" + "F: (E)|I\n" + "I: aY|bY\n"
+			+ "Y: aY|bY|0Y|1Y|€\n";
+	
 	private JTextArea txtGrammar = new JTextArea(GRAMMAR_EXPRESSION);
 	private EditorScrollPane editGrammar = new EditorScrollPane(txtGrammar);
 
@@ -86,14 +84,24 @@ public class GrammarApplet extends JApplet {
 			"return", "class", "new", "volatile", "transient", "try", "catch",
 			"throws", "throw" };
 
-	@Override
-	public void init() {
-		lookandfeel();
+	private static final String NAME = "LL(1)-Parsergenerator";
+	private static final String VERSION = "0.3";
 
+	public GrammarProgram() {
+		lookandfeel();
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout(5, 5));
 
 		LogListRenderer.install(lstLoggingModel);
 		lstLogging.setCellRenderer(new LogListRenderer());
+
+		scrLogging.getVerticalScrollBar().addAdjustmentListener(
+				new AdjustmentListener() {
+					public void adjustmentValueChanged(AdjustmentEvent e) {
+						e.getAdjustable().setValue(
+								e.getAdjustable().getMaximum());
+					}
+				});
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
@@ -168,12 +176,7 @@ public class GrammarApplet extends JApplet {
 			}
 
 			private void change(DocumentEvent e) {
-				try {
-					checkInput(e.getDocument().getText(0,
-							e.getDocument().getLength()));
-				} catch (BadLocationException e1) {
-					e1.printStackTrace();
-				}
+				checkInput(txtInput.getText());
 			}
 		});
 
@@ -192,9 +195,9 @@ public class GrammarApplet extends JApplet {
 	private void lookandfeel() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//			UIManager
-			
-//					.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+			// UIManager
+
+			// .setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -207,7 +210,7 @@ public class GrammarApplet extends JApplet {
 		return p;
 	}
 
-	public  void success(JComponent c) {
+	public void success(JComponent c) {
 		c.setBackground(SUCCESS);
 	}
 
@@ -264,8 +267,6 @@ public class GrammarApplet extends JApplet {
 				treeParse.setModel(new AstJTreeAdapter(parser.getParseTree()));
 				String leafWord = parser.getParseTree().getLeafWord();
 				lblLeafWord.setText(leafWord);
-				System.out.println(parser.getParseTree().deepestPath());
-				// treeParse.expandPath();
 
 				if (leafWord.equals(input)) {
 					success(txtInput);
@@ -274,7 +275,6 @@ public class GrammarApplet extends JApplet {
 					error(txtInput);
 					status("word mismatch!", Level.ERROR);
 				}
-				expandAll(treeParse, true);
 			} catch (IllegalStateException e) {
 				status("Input string is not well-known for the given grammar",
 						Level.ERROR);
@@ -287,33 +287,11 @@ public class GrammarApplet extends JApplet {
 			status("no parser was compiled", Level.WARNING);
 		}
 	}
-
-	// If expand is true, expands all nodes in the tree.
-	// Otherwise, collapses all nodes in the tree.
-	public void expandAll(JTree tree, boolean expand) {
-		TreeNode root = (TreeNode) tree.getModel().getRoot();
-
-		// Traverse tree from root
-		expandAll(tree, new TreePath(root), expand);
+	
+	public static void main(String[] args) {
+		GrammarProgram gp = new GrammarProgram();
+		gp.setTitle(NAME + " - "+VERSION);
+		gp.pack();
+		gp.setVisible(true);
 	}
-
-	private void expandAll(JTree tree, TreePath parent, boolean expand) {
-		// Traverse children
-		TreeNode node = (TreeNode) parent.getLastPathComponent();
-		if (node.getChildCount() >= 0) {
-			for (Enumeration<?> e = node.children(); e.hasMoreElements();) {
-				TreeNode n = (TreeNode) e.nextElement();
-				TreePath path = parent.pathByAddingChild(n);
-				expandAll(tree, path, expand);
-			}
-		}
-
-		// Expansion or collapse must be done bottom-up
-		if (expand) {
-			tree.expandPath(parent);
-		} else {
-			tree.collapsePath(parent);
-		}
-	}
-
 }
