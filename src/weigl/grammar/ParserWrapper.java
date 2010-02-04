@@ -3,10 +3,10 @@ package weigl.grammar;
 
 import java.io.IOException;
 
-import weigl.tools.compiler.OnTheFlyCompiler;
 import weigl.grammar.rt.AST;
 import weigl.grammar.rt.Parser;
 import weigl.grammar.rt.ParserFather;
+import weigl.tools.compiler.OnTheFlyCompiler;
 
 /**
  * Decorator for JavaSources of parser. It compiles the sources and instantiate

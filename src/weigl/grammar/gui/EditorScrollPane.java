@@ -69,6 +69,7 @@ public class EditorScrollPane extends JScrollPane implements DocumentListener {
 	}
 
 	public void update() {
+		m_currentFont=m_textComponent.getFont();
 		updateHighlighter();
 	}
 

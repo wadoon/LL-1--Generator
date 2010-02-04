@@ -1,0 +1,24 @@
+// For token declaration use "=" 
+// NAME = REGEX
+// For rule declaration use ":"
+
+//Naming convention:
+// literals in "" 
+// token in lowercase
+// RULES in uppercase
+
+
+string = \w+
+
+START: "user: " string | "password: " string  
+
+
+//ll(1) -- grammar:
+S: T|R      // 
+T: L=AN     // TOKEN -> LCASE IDENTIFIER '=' ANYTHING
+R: U:B		// RULE  -> UCASE IDENFIER   ':' LISTE 
+
+A: €| 'a'A|'b'A|'c'A|'d'A|'e'A  ... //Any  characters
+L: €| 'a'L|'b'L|'c'L|'d'L|'e'L  ... //only lower case characters
+U: €| 'A'L|'B'L|'D'L|'E'L|'C'L  ... //only upper case characters
+B: A | A '|' B

@@ -2,7 +2,8 @@ package weigl.grammar;
 
 import java.util.Map.Entry;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 
 /**
  * This class compiles the grammar rules given as a {@link String} into the

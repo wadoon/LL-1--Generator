@@ -1,18 +1,22 @@
-package weigl.grammar.rt;
+package weigl.grammar.lltck.rt;
 
 import java.util.Arrays;
 
-import weigl.grammar.Token;
-import weigl.grammar.rt.AST.Leaf;
+import weigl.grammar.rt.AST;
+import weigl.grammar.rt.Parser;
+import weigl.std.NoMoreElementsException;
 
-public abstract class ParserFather implements Parser {
-	private char[] input;
+public abstract class TokenParserFather<E> implements Parser {
 	protected AST syntaxTree;
-	private int position = 0;
+	private TokenDefinition<E> tokens[];
+	private Tokenizer<E> input;
+	private Token<E> curtok;
 
-	public ParserFather() {
+	public TokenParserFather(TokenDefinition<E>... tokens ) 
+	{
+		this.tokens = tokens;
 	}
-
+	
 	/**
 	 * creates a new node with the given text
 	 * 
@@ -22,20 +26,6 @@ public abstract class ParserFather implements Parser {
 	 */
 	public AST.Node newNode(String text) {
 		return new AST.Node(text);
-	}
-
-	/**
-	 * 
-	 * @param c
-	 * @return
-	 */
-	public Leaf match(char c) {
-		if (c == curpos()) {
-			consume();
-			return new AST.Leaf(new String(new char[] { c }));
-		}
-		error(c);
-		return null;
 	}
 
 	/**
@@ -54,9 +44,9 @@ public abstract class ParserFather implements Parser {
 	 *            character that was expected
 	 * @throws IllegalStateException
 	 */
-	protected void error(char c) throws IllegalStateException {
+	protected void error(TokenDefinition<E> td) throws IllegalStateException {
 		throw new IllegalStateException("ERROR! current:" + curpos()
-				+ " expected: [" + c + "]\n" + errorPosition());
+				+ " expected: [" + td.getType() + "]\n" + errorPosition());
 	}
 
 	/**
@@ -65,17 +55,6 @@ public abstract class ParserFather implements Parser {
 	 */
 	protected String errorPosition() {
 		StringBuilder sb = new StringBuilder();
-
-		int min = Math.max(0, position - 10);
-		int max = Math.min(position + 10, input.length - 1);
-
-		for (int i = min; i <= max; i++)
-			sb.append(input[i]);
-
-		sb.append('\n');
-		for (int i = min; i < position; i++)
-			sb.append(' ');
-		sb.append('^');
 		return sb.toString();
 	}
 
@@ -86,7 +65,7 @@ public abstract class ParserFather implements Parser {
 	 *            characters that were expected
 	 * @throws IllegalStateException
 	 */
-	protected void error(char... c) throws IllegalStateException {
+	protected void error(TokenDefinition<E>... c) throws IllegalStateException {
 		throw new IllegalStateException("ERROR! CURRENT:" + curpos()
 				+ " expected: " + Arrays.toString(c));
 	}
@@ -94,12 +73,8 @@ public abstract class ParserFather implements Parser {
 	/**
 	 * @return current character aka the lookahead
 	 */
-	protected char curpos() {
-		try {
-			return input[position];
-		} catch (ArrayIndexOutOfBoundsException e) {
-			return Token.EPSILON_CHAR;
-		}
+	protected Token<E> curpos() {
+		return curtok;
 	}
 
 	/**
@@ -108,7 +83,7 @@ public abstract class ParserFather implements Parser {
 	 * @return true if end is reached else false
 	 */
 	protected boolean lookahead() {
-		return position >= input.length;
+		return curtok == null;
 	}
 
 	/**
@@ -119,12 +94,11 @@ public abstract class ParserFather implements Parser {
 	 *            chars for looking ahead
 	 * @return true if one character in s matched the lookahead
 	 */
-	protected boolean lookahead(String s) {
-		for (char c : s.toCharArray()) {
-			if (c == Token.EPSILON_CHAR && lookahead())
+	protected boolean lookahead(TokenDefinition<E>... token) {
+		for (TokenDefinition<E> tokenDef : token) {
+			if (curtok.getType() == tokenDef.getType()) {
 				return true;
-			if (c == curpos())
-				return true;
+			}
 		}
 		return false;
 	}
@@ -133,7 +107,14 @@ public abstract class ParserFather implements Parser {
 	 * read one char forward
 	 */
 	protected void consume() {
-		position++;
+		try {
+			curtok = input.next();
+		} catch (NoMoreElementsException e) {
+			curtok = null;
+		} catch (RecognitionException e) {
+			System.err.println(e.getMessage());
+			error();
+		}
 	}
 
 	/**
@@ -147,14 +128,12 @@ public abstract class ParserFather implements Parser {
 	@Override
 	public void run(String source) {
 		reset();
-		input = source.toCharArray();
+		input = new Tokenizer<E>(source, tokens);
 		start();
 	}
 
 	private void reset() {
-		position = 0;
 		syntaxTree = null;
-		input = new char[] {};
 	}
 
 	/** {@inheritDoc} */

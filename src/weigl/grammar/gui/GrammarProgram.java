@@ -14,7 +14,6 @@ import java.awt.event.AdjustmentListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
-import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
