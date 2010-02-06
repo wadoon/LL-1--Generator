@@ -1,12 +1,10 @@
 package weigl.grammar.lltck;
 
 import java.io.File;
+
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Set;
-import java.util.Map.Entry;
-
-import weigl.std.Array;
+import java.util.List;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -22,21 +20,22 @@ public class TokenParserGenerator {
 		TokenGrammarParser tgp = new TokenGrammarParser();
 		tgp.run(s);
 		SyntaxTree stx = new SyntaxTree(tgp.getParseTree());
-		for (SynToken e : stx.getTokens()) {
+		List<SynToken> tokens = stx.getTokens();
+		List<SynRule> rules = stx.getRules();
+		FirstSetTokenCalculator fstc = new FirstSetTokenCalculator(rules);
+
+		for (SynToken e : tokens) 
 			System.out.format("%-20s = %20s%n", e.name, e.regex);
+
+		for (SynRule e : rules) 
+		{
+			System.out.format("%-20s%n", e.name);
+			for (SynDerivation d : e.getDerivations()) 
+			{
+				System.out.format("\t%-20s%n", d.getTokenList().toString());
+				System.out.format("\t\t%20s%n", d.getFirstTokens().toString());
+			}
 		}
-
-		for (SynRule e : stx.getRules()) {
-			System.out.format("%-20s = %20s%n", e.name, e.derivation);
-		}
-
-		FirstSetTokenCalculator fstc = new FirstSetTokenCalculator(stx
-				.getRules());
-
-		for (Entry<Array<String>, Set<String>> e : fstc.getFirstSets()
-				.entrySet())
-			System.out.format("%-20s = %20s%n", e.getKey().toString(), e
-					.getValue().toString());
 
 		Configuration cfg = new Configuration();
 		cfg.setDirectoryForTemplateLoading(new File("."));
@@ -48,11 +47,11 @@ public class TokenParserGenerator {
 		SimpleHash rootMap = new SimpleHash();
 		rootMap.put("classname", "ParserTest");
 		rootMap.put("test", new SynRule("test"));
-		rootMap.put("tokens", stx.getTokens());
-		rootMap.put("rules", stx.getRules());
+		rootMap.put("tokens", tokens);
+		rootMap.put("rules", rules);
 		rootMap.put("firstSets", fstc.getFirstSets());
 
 		tpl.process(rootMap, new FileWriter(
-				"src/weigl/grammar/test/ParserTest.java"));
+				"src/weigl/grammar/lltck/ParserTest.java"));
 	}
 }

@@ -18,11 +18,6 @@ import weigl.std.Array;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
-/**
- * 
- * @author Alexander Weigl <alexweigl@gmail.com>
- *
- */
 public class SyntaxTree {
 	private Map<String, String> tokenList = new TreeMap<String, String>();
 	private Multimap<String, Array<String>> ruleList = TreeMultimap.create();
@@ -178,60 +173,3 @@ public class SyntaxTree {
 
 }
 
-class SynToken {
-	public final String name;
-	public final String regex;
-
-	public SynToken(String name, String regex) {
-		this.name = name;
-		this.regex = regex;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getRegex() {
-		return regex;
-	}
-
-}
-
-class SynRule {
-	public final String name;
-	public final List<SynDerivation> derivation = new LinkedList<SynDerivation>();
-
-	public SynRule(String name) {
-		this.name = name;
-	}
-
-	public void add(Array<String> derivation) {
-		this.derivation.add(new SynDerivation(derivation));
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public List<SynDerivation> getDerivation() {
-		return derivation;
-	}
-}
-
-class SynDerivation {
-	public final Array<String> tokenList;
-	public Set<String> firstTokens = new TreeSet<String>();
-
-	public SynDerivation(Array<String> tokenList) {
-		this.tokenList = tokenList;
-	}
-
-	public Set<String> getFirstTokens() {
-		return firstTokens;
-	}
-
-
-	public Array<String> getTokenList() {
-		return tokenList;
-	}
-}

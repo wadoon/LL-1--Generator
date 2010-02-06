@@ -2,8 +2,7 @@ package weigl.grammar.lltck;
 
 import weigl.grammar.gui.TestDialog;
 import weigl.grammar.rt.*;
-import weigl.grammar.rt.AST.Leaf;
-import weigl.grammar.rt.AST.Node;
+import weigl.grammar.rt.AST.*;
 
 public class TokenGrammarParser extends ParserFather {
 	private static final String UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -15,7 +14,7 @@ public class TokenGrammarParser extends ParserFather {
 		syntaxTree = new AST(file());
 	}
 
-	public AST.Node anything() {
+	public Node anything() {
 		final AST.Node n = newNode("ANYCASE");
 		while (lookahead(ANYCASE)) {
 			n.add(match(curpos()));
@@ -48,7 +47,7 @@ public class TokenGrammarParser extends ParserFather {
 	 * E: QF|UF F: ' 'E|€
 	 */
 	private Leaf ruleElements_() {
-		final AST.Node n = newNode("ELEMENTS_");
+		final Node n = newNode("ELEMENTS_");
 		if (lookahead())
 			n.add(new AST.Leaf("€"));
 		else if (lookahead(" "))
@@ -154,7 +153,7 @@ public class TokenGrammarParser extends ParserFather {
 		System.out.println(s);
 		Parser p = new TokenGrammarParser();
 		p.run(s);
-		AST tree = p.getParseTree();
+		AST tree = (AST) p.getParseTree();
 		tree = new AST((Node) SyntaxTree.compress(tree.getRoot()));
 		TestDialog.showFrame(tree);
 	}

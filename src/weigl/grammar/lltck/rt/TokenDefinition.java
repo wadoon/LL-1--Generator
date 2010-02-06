@@ -10,4 +10,6 @@ import java.util.regex.Pattern;
 public interface TokenDefinition<E> {
 	public E getType();
 	public Pattern getPattern();
+	public boolean isRule();
+	public boolean isHidden();
 }

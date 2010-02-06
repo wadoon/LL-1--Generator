@@ -36,9 +36,9 @@ public class FirstSetTokenCalculator {
 		}
 	}
 
-	private Set<String> calculateFirstSet(Array<String> value) {
+	private Set<String> calculateFirstSet(List<String> value) {
 		Set<String> firstTokens = new TreeSet<String>();
-		for (String s : value.elements()) {
+		for (String s : value) {
 			if (StringUtils.isUpper(s)) {
 				for (SynDerivation e : get(s))
 					firstTokens.addAll(calculateFirstSet(e.tokenList));

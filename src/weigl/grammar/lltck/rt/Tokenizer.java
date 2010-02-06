@@ -14,7 +14,8 @@ import weigl.std.WIterator;
  * @param <E>
  *            the token type class
  */
-public class Tokenizer<E> implements WIterator<Token<E>> {
+public class Tokenizer<E extends TokenDefinition<E>> implements
+		WIterator<Token<E>> {
 	private List<TokenDefinition<E>> tokens;
 	private String input;
 
@@ -49,17 +50,24 @@ public class Tokenizer<E> implements WIterator<Token<E>> {
 	public Token<E> next() throws NoMoreElementsException, RecognitionException {
 		if (input.isEmpty())
 			throw new NoMoreElementsException();
-
+		Token<E> tok;
 		if (matchType == MatchType.FIRST)
-			return firstMatch();
+			tok = firstMatch();
 		else
-			return bestMatch();
+			tok = bestMatch();
+
+		if (tok.getType().isHidden())
+			return next();
+
+		return tok;
 	}
 
 	public Token<E> bestMatch() {
 		int best = 0;
 		Token<E> matched = null;
 		for (TokenDefinition<E> token : tokens) {
+			if (token.isRule())
+				continue;
 			Matcher m = token.getPattern().matcher(input);
 			if (m.lookingAt() && m.end() > best) {
 				best = m.end();
@@ -73,6 +81,8 @@ public class Tokenizer<E> implements WIterator<Token<E>> {
 
 	public Token<E> firstMatch() throws RecognitionException {
 		for (TokenDefinition<E> token : tokens) {
+			if (token.isRule())
+				continue;
 			Matcher m = token.getPattern().matcher(input);
 			if (m.lookingAt()) {
 				String matched = input.substring(0, m.end());
@@ -85,7 +95,8 @@ public class Tokenizer<E> implements WIterator<Token<E>> {
 	}
 
 	public static void main(String[] args) throws RecognitionException {
-		Tokenizer<MathTokens> t = new Tokenizer<MathTokens>("2*2", MathTokens.values());
+		Tokenizer<MathTokens> t = new Tokenizer<MathTokens>("2*2", MathTokens
+				.values());
 
 		try {
 			while (true) {

@@ -40,7 +40,7 @@ public class ParserWrapper implements Parser {
 
 	@Override
 	public AST getParseTree() {
-		return parser.getParseTree();
+		return (AST) parser.getParseTree();
 	}
 
 	@Override

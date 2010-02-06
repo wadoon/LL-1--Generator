@@ -5,7 +5,7 @@ package weigl.grammar.lltck.rt;
  * @author Alexander Weigl <alexweigl@gmail.com>
  * @param <E> the token enum class
  */
-public class Token<E> {
+public class Token<E extends TokenDefinition<E>> {
 	final E name;
 	final String value;
 

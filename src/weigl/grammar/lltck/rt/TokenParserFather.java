@@ -2,30 +2,35 @@ package weigl.grammar.lltck.rt;
 
 import java.util.Arrays;
 
-import weigl.grammar.rt.AST;
-import weigl.grammar.rt.Parser;
+import static weigl.grammar.lltck.rt.DefaultAbstractSyntaxTree.*;
+import weigl.grammar.lltck.rt.interfaces.AST;
+import weigl.grammar.lltck.rt.interfaces.Leaf;
+import weigl.grammar.lltck.rt.interfaces.Node;
 import weigl.std.NoMoreElementsException;
 
-public abstract class TokenParserFather<E> implements Parser {
-	protected AST syntaxTree;
+public abstract class TokenParserFather<E extends TokenDefinition<E>> implements Parser<Token<E>> {
+	protected AST<Token<E>> syntaxTree;
 	private TokenDefinition<E> tokens[];
 	private Tokenizer<E> input;
 	private Token<E> curtok;
 
-	public TokenParserFather(TokenDefinition<E>... tokens ) 
-	{
+	public TokenParserFather(TokenDefinition<E>... tokens) {
 		this.tokens = tokens;
 	}
-	
+
 	/**
 	 * creates a new node with the given text
 	 * 
-	 * @param text
+	 * @param tok
 	 *            nodes contents
 	 * @return a node
 	 */
-	public AST.Node newNode(String text) {
-		return new AST.Node(text);
+	public Node<Token<E>> newNode(Token<E> tok) {
+		return new DefaultNode<Token<E>>(tok);
+	}
+
+	public Node<Token<E>> newNode(E tok) {
+		return new DefaultNode<Token<E>>(new Token<E>(tok, "<rule>"));
 	}
 
 	/**
@@ -103,6 +108,10 @@ public abstract class TokenParserFather<E> implements Parser {
 		return false;
 	}
 
+	protected boolean lookahead(TokenDefinition<E> token) {
+		return curtok.getType() == token.getType();
+	}
+
 	/**
 	 * read one char forward
 	 */
@@ -117,10 +126,20 @@ public abstract class TokenParserFather<E> implements Parser {
 		}
 	}
 
+	public Leaf<Token<E>> match(TokenDefinition<E> td) {
+		if (lookahead(td)) {
+			Token<E> tok = curpos();
+			consume();
+			return newNode(tok);
+		}
+		error(td);
+		return null;
+	}
+
 	/**
 	 * start method. should only invoke the start symbol of the grammar
 	 */
-	public abstract void start();
+	public abstract Node<Token<E>> start();
 
 	/**
 	 * {@inheritDoc}
@@ -129,7 +148,8 @@ public abstract class TokenParserFather<E> implements Parser {
 	public void run(String source) {
 		reset();
 		input = new Tokenizer<E>(source, tokens);
-		start();
+		consume();
+		syntaxTree = new DefaultAbstractSyntaxTree<Token<E>>(start());
 	}
 
 	private void reset() {
@@ -138,7 +158,7 @@ public abstract class TokenParserFather<E> implements Parser {
 
 	/** {@inheritDoc} */
 	@Override
-	public AST getParseTree() {
+	public AST<Token<E>> getParseTree() {
 		return syntaxTree;
 	};
 }

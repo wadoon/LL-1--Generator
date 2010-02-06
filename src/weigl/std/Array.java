@@ -1,6 +1,8 @@
 package weigl.std;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Class for holding an {@link Array} of type E 
@@ -8,7 +10,9 @@ import java.util.Arrays;
  * @param <E> an {@link Comparable} type
  */
 public class Array<E extends Comparable<E>> 
-						implements Comparable<Array<E>> {
+						implements Comparable<Array<E>>,
+									Iterable<E>
+						{
 	private E[] array;
 
 	public Array(E... tokens) {
@@ -59,5 +63,29 @@ public class Array<E extends Comparable<E>>
 
 	public E[] elements() {
 		return array;
+	}
+
+	public List<E> toList() {
+		return Arrays.asList(array);
+	}
+
+	@Override
+	public Iterator<E> iterator() {
+		return new Iterator<E>() {
+			int i = 0;
+			
+			@Override
+			public boolean hasNext() {
+				return i<array.length;
+			}
+
+			@Override
+			public E next() {
+				return array[i++];
+			}
+
+			@Override
+			public void remove() {}
+		};
 	}
 }
