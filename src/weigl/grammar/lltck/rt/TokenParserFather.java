@@ -8,158 +8,180 @@ import weigl.grammar.lltck.rt.interfaces.Leaf;
 import weigl.grammar.lltck.rt.interfaces.Node;
 import weigl.std.NoMoreElementsException;
 
-public abstract class TokenParserFather<E extends TokenDefinition<E>> implements Parser<Token<E>> {
-	protected AST<Token<E>> syntaxTree;
-	private TokenDefinition<E> tokens[];
-	protected Tokenizer<E> input;
-	private Token<E> curtok;
+public abstract class TokenParserFather<E extends TokenDefinition<E>> implements Parser<E>
+{
+    protected AST<E>           syntaxTree;
+    private TokenDefinition<E> tokens[];
+    protected Tokenizer<E>     input;
+    private Token<E>           curtok;
 
-	public TokenParserFather(TokenDefinition<E>... tokens) {
-		this.setTokens(tokens);
-	}
+    public TokenParserFather(TokenDefinition<E>... tokens)
+    {
+        this.setTokens(tokens);
+    }
 
-	/**
-	 * creates a new node with the given text
-	 * 
-	 * @param tok
-	 *            nodes contents
-	 * @return a node
-	 */
-	public Node<Token<E>> newNode(Token<E> tok) {
-		return new DefaultNode<Token<E>>(tok);
-	}
+    /**
+     * creates a new node with the given text
+     * 
+     * @param tok
+     *            nodes contents
+     * @return a node
+     */
+    public Node<E> newNode(Token<E> tok)
+    {
+        return new DefaultNode<E>(tok);
+    }
 
-	public Node<Token<E>> newNode(E tok) {
-		return new DefaultNode<Token<E>>(new Token<E>(tok, "<rule>"));
-	}
+    public Node<E> newNode(E tok)
+    {
+        return new DefaultNode<E>(new Token<E>(tok, "<rule>"));
+    }
 
-	/**
-	 * method for error reporting
-	 * 
-	 * @throws IllegalStateException
-	 */
-	protected void error() throws IllegalStateException {
-		throw new IllegalStateException("ERROR! expected: []");
-	}
+    /**
+     * method for error reporting
+     * 
+     * @throws IllegalStateException
+     */
+    protected void error() throws IllegalStateException
+    {
+        throw new IllegalStateException("ERROR! expected: []");
+    }
 
-	/**
-	 * method for error reporting
-	 * 
-	 * @param c
-	 *            character that was expected
-	 * @throws IllegalStateException
-	 */
-	protected void error(TokenDefinition<E> td) throws IllegalStateException {
-		throw new IllegalStateException("ERROR! current:" + curpos()
-				+ " expected: [" + td.getType() + "]\n" + errorPosition());
-	}
+    /**
+     * method for error reporting
+     * 
+     * @param c
+     *            character that was expected
+     * @throws IllegalStateException
+     */
+    protected void error(TokenDefinition<E> td) throws IllegalStateException
+    {
+        throw new IllegalStateException("ERROR! current:" + curpos() + " expected: ["
+                        + td.getType() + "]\n" + errorPosition());
+    }
 
-	/**
-	 * 
-	 * @return
-	 */
-	protected String errorPosition() {
-		StringBuilder sb = new StringBuilder();
-		return sb.toString();
-	}
+    /**
+     * @return
+     */
+    protected String errorPosition()
+    {
+        StringBuilder sb = new StringBuilder();
+        return sb.toString();
+    }
 
-	/**
-	 * method for error reporting
-	 * 
-	 * @param c
-	 *            characters that were expected
-	 * @throws IllegalStateException
-	 */
-	protected void error(TokenDefinition<E>... c) throws IllegalStateException {
-		throw new IllegalStateException("ERROR! CURRENT:" + curpos()
-				+ " expected: " + Arrays.toString(c));
-	}
+    /**
+     * method for error reporting
+     * 
+     * @param c
+     *            characters that were expected
+     * @throws IllegalStateException
+     */
+    protected void error(TokenDefinition<E>... c) throws IllegalStateException
+    {
+        throw new IllegalStateException("ERROR! CURRENT:" + curpos() + " expected: "
+                        + Arrays.toString(c));
+    }
 
-	/**
-	 * @return current character aka the lookahead
-	 */
-	protected Token<E> curpos() {
-		return curtok;
-	}
+    /**
+     * @return current character aka the lookahead
+     */
+    protected Token<E> curpos()
+    {
+        return curtok;
+    }
 
-	/**
-	 * lookahead for the end of the input.
-	 * 
-	 * @return true if end is reached else false
-	 */
-	protected boolean lookahead() {
-		return curtok == null;
-	}
+    /**
+     * lookahead for the end of the input.
+     * 
+     * @return true if end is reached else false
+     */
+    protected boolean lookahead()
+    {
+        return curtok == null;
+    }
 
-	/**
-	 * searches the lookahead after each char in the string. on match return
-	 * true
-	 * 
-	 * @param s
-	 *            chars for looking ahead
-	 * @return true if one character in s matched the lookahead
-	 */
-	protected boolean lookahead(TokenDefinition<E>... token) {
-		for (TokenDefinition<E> tokenDef : token) {
-			if (curtok.getType() == tokenDef.getType()) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * searches the lookahead after each char in the string. on match return
+     * true
+     * 
+     * @param s
+     *            chars for looking ahead
+     * @return true if one character in s matched the lookahead
+     */
+    protected boolean lookahead(TokenDefinition<E>... token)
+    {
+        for (TokenDefinition<E> tokenDef : token)
+        {
+            if (curtok.getType() == tokenDef.getType()) { return true; }
+        }
+        return false;
+    }
 
-	protected boolean lookahead(TokenDefinition<E> token) {
-		return curtok.getType() == token.getType();
-	}
+    protected boolean lookahead(TokenDefinition<E> token)
+    {
+        return curtok.getType() == token.getType();
+    }
 
-	/**
-	 * read one char forward
-	 */
-	protected void consume() {
-		try {
-			curtok = input.next();
-		} catch (NoMoreElementsException e) {
-			curtok = null;
-		} catch (RecognitionException e) {
-			System.err.println(e.getMessage());
-			error();
-		}
-	}
+    /**
+     * read one char forward
+     */
+    protected void consume()
+    {
+        try
+        {
+            curtok = input.next();
+        } catch (NoMoreElementsException e)
+        {
+            curtok = null;
+        } catch (RecognitionException e)
+        {
+            System.err.println(e.getMessage());
+            error();
+        }
+    }
 
-	public Leaf<Token<E>> match(TokenDefinition<E> td) {
-		if (lookahead(td)) {
-			Token<E> tok = curpos();
-			consume();
-			return newNode(tok);
-		}
-		error(td);
-		return null;
-	}
+    public Leaf<E> match(TokenDefinition<E> td)
+    {
+        if (lookahead(td))
+        {
+            Token<E> tok = curpos();
+            consume();
+            return newNode(tok);
+        }
+        error(td);
+        return null;
+    }
 
-	/**
-	 * start method. should only invoke the start symbol of the grammar
-	 */
-	public abstract Node<Token<E>> start();
+    /**
+     * start method. should only invoke the start symbol of the grammar
+     */
+    public abstract Node<E> start();
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public abstract void run(String source);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract void run(String source);
 
-	public void reset() { syntaxTree = null; }
+    public void reset()
+    {
+        syntaxTree = null;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public AST<Token<E>> getParseTree() {
-		return syntaxTree;
-	}
+    /** {@inheritDoc} */
+    @Override
+    public AST<E> getParseTree()
+    {
+        return syntaxTree;
+    }
 
-	public void setTokens(TokenDefinition<E> tokens[]) {
-		this.tokens = tokens;
-	}
+    public void setTokens(TokenDefinition<E> tokens[])
+    {
+        this.tokens = tokens;
+    }
 
-	public TokenDefinition<E>[] getTokens() {
-		return tokens;
-	};
+    public TokenDefinition<E>[] getTokens()
+    {
+        return tokens;
+    };
 }

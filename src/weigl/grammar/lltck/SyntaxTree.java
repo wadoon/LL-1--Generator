@@ -23,8 +23,10 @@ import com.google.common.collect.TreeMultimap;
  * @author Alexander Weigl <alexweigl@gmail.com>
  * @date 2010-02-04
  */
+@Deprecated
 public class SyntaxTree
 {
+
     private Map<String, String>             tokenList = new TreeMap<String, String>();
     private Multimap<String, Array<String>> ruleList  = TreeMultimap.create();
 
@@ -157,7 +159,8 @@ public class SyntaxTree
             if (child.hasChildren())
             {
                 Leaf n = compressLeaf((Node) child);
-                if (n != null) elements.set(elements.indexOf(child), n);
+                if (n != null)
+                    elements.set(elements.indexOf(child), n);
             }
         }
 
@@ -210,9 +213,10 @@ public class SyntaxTree
             {
                 Leaf child = compressTree((AST.Node) l);
                 if (child == null) // if null, then child has no children
-                old.remove(l);
-                else // else replace this node by an new node
-                old.set(old.indexOf(l), child);
+                    old.remove(l);
+                else
+                    // else replace this node by an new node
+                    old.set(old.indexOf(l), child);
             }
         }
 
@@ -222,7 +226,8 @@ public class SyntaxTree
         }
         else
         {
-            if (old.size() == 0) return null;
+            if (old.size() == 0)
+                return null;
             Leaf child = old.get(0);
             // remove newlines and \n and EPSILONS
             return child.getTerminalSymbol().equals("€")

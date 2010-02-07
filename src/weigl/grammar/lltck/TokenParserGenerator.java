@@ -1,31 +1,42 @@
 package weigl.grammar.lltck;
 
-import java.io.File;
-
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.util.List;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.SimpleHash;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 
 public class TokenParserGenerator
 {
-    public static void main(String[] args) throws IOException, TemplateException
-    {
-        final String s = "string = \\w+\n" + "$whitespaces = \\s+\n"
-                        + "START: \"user: \" string | \"password: \" string | START \n";
-        TokenGrammarParser tgp = new TokenGrammarParser();
-        tgp.run(s);
-        SyntaxTree stx = new SyntaxTree(tgp.getParseTree());
-        List<SynToken> tokens = stx.getTokens();
-        List<SynRule> rules = stx.getRules();
+    public static final String   CLAZZ_NAME     = "TParser";
+    public static final String   CONANCIAL_NAME = "weigl.grammar.lltck." + CLAZZ_NAME;
+    public static final String[] CLASSES_NAMES  = new String[] { CONANCIAL_NAME,
+                    CONANCIAL_NAME + "$Rule" + CLAZZ_NAME + "Callback",
+                    CONANCIAL_NAME + "$Rule" + CLAZZ_NAME + "CallbackAdapter",
+                    CONANCIAL_NAME + "$Token" + CLAZZ_NAME + "Callback",
+                    "weigl.grammar.lltck.TokenTParser" };
 
-        // is this not an anti pattern?
-        new FirstSetTokenCalculator(rules);
+    private String               source;
+    private TokenGrammarParser   stx;
+    private List<SynRule>        rules;
+    private List<SynToken>       tokens;
+
+    public TokenParserGenerator(String text) throws LeftRecursionException, RuleUnknownException
+    {
+        source = text;
+        parse();
+    }
+
+    private void parse() throws LeftRecursionException, RuleUnknownException
+    {
+        stx = new TokenGrammarParser(source);
+        rules = stx.getRules();
+        tokens = stx.getTokens();
+        GrammarAlgorithms.check(rules);
 
         for (SynToken e : tokens)
             System.out.format("%-20s = %20s%n", e.name, e.regex);
@@ -39,21 +50,40 @@ public class TokenParserGenerator
                 System.out.format("\t\t%20s%n", d.getFirstTokens().toString());
             }
         }
+    }
 
-        Configuration cfg = new Configuration();
-        cfg.setDirectoryForTemplateLoading(new File("."));
-        cfg.setObjectWrapper(DefaultObjectWrapper.DEFAULT_WRAPPER);
-        cfg.setDefaultEncoding("UTF-8");
+    public String getJavaSource()
+    {
+        try
+        {
 
-        Template tpl = cfg.getTemplate("Parser.ftl");
+            Configuration cfg = new Configuration();
+            cfg.setObjectWrapper(DefaultObjectWrapper.DEFAULT_WRAPPER);
+            cfg.setDefaultEncoding("UTF-8");
 
-        SimpleHash rootMap = new SimpleHash();
-        rootMap.put("classname", "ParserTest");
-        rootMap.put("test", new SynRule("test"));
-        rootMap.put("tokens", tokens);
-        rootMap.put("rules", rules);
-        rootMap.put("input", s);
+            Reader reader = new InputStreamReader(getClass().getResourceAsStream("Parser.ftl"));
 
-        tpl.process(rootMap, new FileWriter("src/weigl/grammar/lltck/ParserTest.java"));
+            Template tpl;
+            tpl = new Template("Parser", reader, cfg);
+
+            SimpleHash rootMap = new SimpleHash();
+            rootMap.put("classname", CLAZZ_NAME);
+            rootMap.put("tokens", tokens);
+            rootMap.put("rules", rules);
+            rootMap.put("input", source);
+
+            StringWriter output = new StringWriter(1024);
+            tpl.process(rootMap, output);
+            return output.getBuffer().toString();
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public String getClassName()
+    {
+        return CLAZZ_NAME;
     }
 }

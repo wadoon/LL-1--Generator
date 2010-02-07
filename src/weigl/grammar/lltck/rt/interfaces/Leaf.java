@@ -1,7 +1,13 @@
 package weigl.grammar.lltck.rt.interfaces;
 
-public interface Leaf<E> {
-	public abstract E getTerminalSymbol();
-	public abstract void setTerminalSymbol(E terminalSymbol);
-	public abstract boolean hasChildren();
+import weigl.grammar.lltck.rt.Token;
+import weigl.grammar.lltck.rt.TokenDefinition;
+
+public interface Leaf<E extends TokenDefinition<E>>
+{
+    public abstract Token<E> getTerminalSymbol();
+
+    public abstract void setTerminalSymbol(Token<E> terminalSymbol);
+
+    public abstract boolean hasChildren();
 }

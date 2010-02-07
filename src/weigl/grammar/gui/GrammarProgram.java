@@ -1,4 +1,4 @@
-package weigl.grammar.ll.gui;
+package weigl.grammar.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

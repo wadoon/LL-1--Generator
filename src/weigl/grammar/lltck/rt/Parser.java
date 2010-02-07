@@ -11,7 +11,7 @@ import weigl.grammar.lltck.rt.interfaces.AST;
  * @version 1
  *
  */
-public interface Parser<E> {
+public interface Parser<E extends TokenDefinition<E>> {
 	/**
 	 * return the Abstract Syntax Tree for the currently parsed input. 
 	 * @return {@link AST}

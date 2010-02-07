@@ -33,9 +33,9 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 	/**
 	 * <pre>${rule.doc}</pre>
 	 */
-	public Node<Token<${tokenname}>> ${rule.name}()
+	public Node<${tokenname}> ${rule.name}()
 	{	
-		final Node< Token < ${tokenname} > > n = newNode( ${tokenname}.${rule.name} );	
+		final Node<${tokenname}>  n = newNode( ${tokenname}.${rule.name} );	
 		boolean matched = false;
 		<#list rule.derivations as derivation>
 <#t>			if(lookahead(
@@ -47,7 +47,7 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 					<#if exptoken == exptoken?lower_case >
 						n.add(match(${tokenname}.${exptoken}));
 					<#else>
-						n.add(match(${exptoken}()));
+						n.add(${exptoken}());
 					</#if>
 				</#list>
 			}
@@ -70,14 +70,14 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 	
 	
 	@Override
-	public Node<Token<${tokenname}>> start() {return START();}
+	public Node<${tokenname}> start() {return START();}
 
 	public void run(String source)
 	{
 		reset();
 		input = new Tokenizer<${tokenname}>(source,  tokListener , getTokens());
 		consume();
-		start();
+		syntaxTree = new DefaultAbstractSyntaxTree<${tokenname}>( start() );
 	}
 		
 	
@@ -94,7 +94,7 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 	public static interface Rule${classname}Callback 
 	{
 		<#list rules as rule>
-		public Node<Token<${tokenname}>> ${rule.name}(Node<Token<${tokenname}>> node);
+		public Node<${tokenname}> ${rule.name}(Node<${tokenname}> node);
 		</#list>
 	}
 
@@ -102,7 +102,7 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 	{
 		<#list rules as rule>
 		@Override
-		public Node<Token<${tokenname}>> ${rule.name}(Node<Token<${tokenname}>> node)
+		public Node<${tokenname}> ${rule.name}(Node<${tokenname}> node)
 		{
 			return node;
 		}

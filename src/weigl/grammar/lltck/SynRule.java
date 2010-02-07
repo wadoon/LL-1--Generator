@@ -2,6 +2,7 @@ package weigl.grammar.lltck;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import weigl.std.collection.Array;
 
@@ -15,6 +16,7 @@ public class SynRule
     public final String              name;
     public String                    doc;
     public final List<SynDerivation> derivation = new LinkedList<SynDerivation>();
+    private Set<String>              firstSet;
 
     /**
      * creates an new production rule with an empty documentation
@@ -81,8 +83,19 @@ public class SynRule
     {
         for (SynDerivation d : derivation)
         {
-            if (d.firstTokens.contains(FirstSetTokenCalculator.EPSILON)) return true;
+            if (d.firstTokens.contains(GrammarAlgorithms.EPSILON))
+                return true;
         }
         return false;
+    }
+
+    public void setFirstSet(Set<String> rfs)
+    {
+        firstSet = rfs;
+    }
+
+    public Set<String> getFirstSet()
+    {
+        return firstSet;
     }
 }
