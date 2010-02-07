@@ -2,7 +2,7 @@ package weigl.grammar.lltck.rt;
 
 import java.util.Arrays;
 
-import static weigl.grammar.lltck.rt.DefaultAbstractSyntaxTree.*;
+import weigl.grammar.lltck.rt.DefaultAbstractSyntaxTree.DefaultNode;
 import weigl.grammar.lltck.rt.interfaces.AST;
 import weigl.grammar.lltck.rt.interfaces.Leaf;
 import weigl.grammar.lltck.rt.interfaces.Node;

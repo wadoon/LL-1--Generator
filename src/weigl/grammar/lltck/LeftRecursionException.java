@@ -2,6 +2,7 @@ package weigl.grammar.lltck;
 
 public class LeftRecursionException extends Exception
 {
+    private static final long serialVersionUID = -6947797028777531838L;
 
     public LeftRecursionException()
     {

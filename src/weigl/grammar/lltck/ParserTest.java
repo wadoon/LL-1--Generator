@@ -1,8 +1,13 @@
 package weigl.grammar.lltck;
 
 import java.util.regex.Pattern;
-import weigl.grammar.lltck.rt.*;
-import weigl.grammar.lltck.rt.interfaces.*;
+
+import weigl.grammar.lltck.rt.DefaultAbstractSyntaxTree;
+import weigl.grammar.lltck.rt.Token;
+import weigl.grammar.lltck.rt.TokenDefinition;
+import weigl.grammar.lltck.rt.TokenParserFather;
+import weigl.grammar.lltck.rt.Tokenizer;
+import weigl.grammar.lltck.rt.interfaces.Node;
 
 /**
  *

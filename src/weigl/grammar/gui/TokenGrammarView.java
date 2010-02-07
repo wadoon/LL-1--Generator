@@ -3,7 +3,6 @@ package weigl.grammar.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -112,10 +111,10 @@ public class TokenGrammarView extends JFrame {
 
         JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
-        editGrammar.createDefault().setBackground(txtGrammar.getBackground())
-                .setForeground(txtGrammar.getForeground()).setFont(
-                        Font.MONOSPACED, 22);
-        editGrammar.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
+//        editGrammar.createDefault().setBackground(txtGrammar.getBackground())
+//                .setForeground(txtGrammar.getForeground()).setFont(
+//                        Font.MONOSPACED, 22);
+//        editGrammar.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
 
         JPanel pWest = new JPanel(new BorderLayout());
         JComponent p = createBorder(editGrammar, "Grammar Input:");

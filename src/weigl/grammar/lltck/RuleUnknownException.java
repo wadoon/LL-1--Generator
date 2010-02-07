@@ -2,6 +2,7 @@ package weigl.grammar.lltck;
 
 public class RuleUnknownException extends Exception
 {
+    private static final long serialVersionUID = 1L;
 
     public RuleUnknownException()
     {

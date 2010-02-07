@@ -1,14 +1,14 @@
 package weigl.grammar.lltck.rt;
 
 import java.util.ArrayList;
-
 import java.util.LinkedList;
-
 import java.util.List;
 
 import javax.swing.tree.TreePath;
 
-import weigl.grammar.lltck.rt.interfaces.*;
+import weigl.grammar.lltck.rt.interfaces.AST;
+import weigl.grammar.lltck.rt.interfaces.Leaf;
+import weigl.grammar.lltck.rt.interfaces.Node;
 
 /**
  * Representation for an <b>Abstract Syntax Tree</b><br>
