@@ -120,7 +120,7 @@ public class Tokenizer<E extends TokenDefinition<E>> implements WIterator<Token<
             }
         }
         throw new RecognitionException("no token definition matched for rest string: '" + input
-                        + "  @" + inputPosition + "'");
+                        + ", position:" + inputPosition + "'");
     }
 
     public class TokenTypeCaller

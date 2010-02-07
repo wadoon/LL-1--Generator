@@ -1,9 +1,12 @@
 package weigl.grammar.lltck;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.util.List;
+
+import weigl.io.file.FileUtils;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -80,6 +83,18 @@ public class TokenParserGenerator
             e.printStackTrace();
         }
         return "";
+    }
+    
+    public static void main(String[] args) throws IOException, LeftRecursionException, RuleUnknownException
+    {
+        String s = "$whitespace = \\s\n"+
+        "digits = \\d+\n"+
+        "letters = \\w+\n"+
+        "\n"+
+        "START: digits letters digits";
+        
+        TokenParserGenerator tgp = new TokenParserGenerator(s);
+        FileUtils.writeTo("src/weigl/grammar/lltck/TParser.java",tgp.getJavaSource() );
     }
 
     public String getClassName()
