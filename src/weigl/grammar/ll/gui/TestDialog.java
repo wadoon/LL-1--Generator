@@ -1,4 +1,4 @@
-package weigl.grammar.gui;
+package weigl.grammar.ll.gui;
 
 
 import java.awt.BorderLayout;
@@ -6,7 +6,7 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JTree;
 
-import weigl.grammar.rt.AST;
+import weigl.grammar.ll.rt.AST;
 
 public class TestDialog {
 	public static  void showFrame(AST ast) {

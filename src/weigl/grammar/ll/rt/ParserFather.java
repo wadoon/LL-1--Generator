@@ -1,9 +1,9 @@
-package weigl.grammar.rt;
+package weigl.grammar.ll.rt;
 
 import java.util.Arrays;
 
-import weigl.grammar.Token;
-import weigl.grammar.rt.AST.Leaf;
+import weigl.grammar.ll.Token;
+import weigl.grammar.ll.rt.AST.Leaf;
 
 public abstract class ParserFather implements Parser {
 	private char[] input;

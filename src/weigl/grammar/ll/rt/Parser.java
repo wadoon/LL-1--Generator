@@ -1,4 +1,4 @@
-package weigl.grammar.rt;
+package weigl.grammar.ll.rt;
 
 /**
  * Interface for describing a parser.<br>

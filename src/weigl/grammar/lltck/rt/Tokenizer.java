@@ -1,7 +1,14 @@
 package weigl.grammar.lltck.rt;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.MethodDescriptor;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 import weigl.std.NoMoreElementsException;
@@ -20,6 +27,7 @@ public class Tokenizer<E extends TokenDefinition<E>> implements
 	private String input;
 
 	private MatchType matchType = MatchType.FIRST;
+	private TokenTypeCaller callback;
 
 	/**
 	 * @param input
@@ -28,6 +36,13 @@ public class Tokenizer<E extends TokenDefinition<E>> implements
 	 *            {@link TokenDefinition} to searching for
 	 */
 	public Tokenizer(String input, TokenDefinition<E>... tokens) {
+		this.tokens = Arrays.asList(tokens);
+		this.input = input;
+	}
+
+	public Tokenizer(String input, Object listener,
+			TokenDefinition<E>... tokens) {
+		this.callback = new TokenTypeCaller(listener);
 		this.tokens = Arrays.asList(tokens);
 		this.input = input;
 	}
@@ -50,15 +65,20 @@ public class Tokenizer<E extends TokenDefinition<E>> implements
 	public Token<E> next() throws NoMoreElementsException, RecognitionException {
 		if (input.isEmpty())
 			throw new NoMoreElementsException();
-		Token<E> tok;
-		if (matchType == MatchType.FIRST)
-			tok = firstMatch();
-		else
-			tok = bestMatch();
+		Token<E> tok = findToken();
+		callback.onToken(tok);
+		return tok;
+	}
 
+	private Token<E> findToken() throws RecognitionException,
+			NoMoreElementsException {
+		Token<E> tok = 
+				  matchType == MatchType.FIRST 
+				? firstMatch()
+				: bestMatch();
+				
 		if (tok.getType().isHidden())
-			return next();
-
+			return findToken();
 		return tok;
 	}
 
@@ -94,39 +114,76 @@ public class Tokenizer<E extends TokenDefinition<E>> implements
 				"no token definition matched for rest string: '" + input + "'");
 	}
 
-	public static void main(String[] args) throws RecognitionException {
-		Tokenizer<MathTokens> t = new Tokenizer<MathTokens>("2*2", MathTokens
-				.values());
+	public class TokenTypeCaller {
+		private Object obj;
+		private Map<String, Method> map = new HashMap<String, Method>();
 
-		try {
-			while (true) {
-				Token<MathTokens> f1 = t.next();
-				Token<MathTokens> o = t.next();
-				Token<MathTokens> f2 = t.next();
+		public TokenTypeCaller(Object obj) {
+			BeanInfo beanInfo;
+			if (obj != null) {
+				try {
+					this.obj = obj;
+					beanInfo = Introspector.getBeanInfo(obj.getClass());
 
-				int i = Integer.parseInt(f1.getValue()), j = Integer
-						.parseInt(f2.getValue());
-
-				switch (o.getType()) {
-				case DIV:
-					System.out.println(i / j);
-					break;
-				case MULTIPLY:
-					System.out.println(i * j);
-					break;
-				case MINUS:
-					System.out.println(i - j);
-					break;
-				case PLUS:
-					System.out.println(i + j);
-					break;
-				default:
-					System.err.println("ERROR: " + o.getType());
+					for (MethodDescriptor md : beanInfo.getMethodDescriptors())
+						map.put(md.getName(), md.getMethod());
+				} catch (IntrospectionException e) {
+					obj = null;
+					e.printStackTrace();
 				}
 			}
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		} catch (NoMoreElementsException e) {
+		}
+
+		public void onToken(Token<E> token) {
+			if (obj != null) {
+				Method m = map.get(token.getType().toString());
+				if (m != null) {
+					try {
+						Object robj = m.invoke(obj, token);
+						token.setValue(robj);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} else {
+					System.err.println("no suitable method for  "
+							+ token.getType().toString() + " was found!");
+				}
+			}
 		}
 	}
+	// public static void main(String[] args) throws RecognitionException {
+	// Tokenizer<MathTokens> t = new Tokenizer<MathTokens>("2*2", MathTokens
+	// .values());
+	//
+	// try {
+	// while (true) {
+	// Token<MathTokens> f1 = t.next();
+	// Token<MathTokens> o = t.next();
+	// Token<MathTokens> f2 = t.next();
+	//
+	// int i = Integer.parseInt(f1.getValue()), j = Integer
+	// .parseInt(f2.getValue());
+	//
+	// switch (o.getType()) {
+	// case DIV:
+	// System.out.println(i / j);
+	// break;
+	// case MULTIPLY:
+	// System.out.println(i * j);
+	// break;
+	// case MINUS:
+	// System.out.println(i - j);
+	// break;
+	// case PLUS:
+	// System.out.println(i + j);
+	// break;
+	// default:
+	// System.err.println("ERROR: " + o.getType());
+	// }
+	// }
+	// } catch (NumberFormatException e) {
+	// e.printStackTrace();
+	// } catch (NoMoreElementsException e) {
+	// }
+	// }
 }

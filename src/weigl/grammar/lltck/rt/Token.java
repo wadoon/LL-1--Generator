@@ -2,36 +2,52 @@ package weigl.grammar.lltck.rt;
 
 /**
  * Describes a found token with the matched string and token type
+ * 
  * @author Alexander Weigl <alexweigl@gmail.com>
- * @param <E> the token enum class
+ * @param <E>
+ *            the token enum class
  */
 public class Token<E extends TokenDefinition<E>> {
-	final E name;
-	final String value;
+	private final E type;
+	private final int position;
+	private Object value;
 
-	public Token(E name, String value) {
-		this.name = name;
+	public Token(E name, String str) {
+		this(name, str, -1);
+	}
+
+	public Token(E name, String value, int pos) {
+		this.type = name;
+		this.value = value;
+		this.position = pos;
+	}
+
+	public void setValue(Object value) {
 		this.value = value;
 	}
 
-	public E getType() {
-		return name;
+	public int getPosition() {
+		return position;
 	}
 
-	public String getValue() {
+	public E getType() {
+		return type;
+	}
+
+	public Object getValue() {
 		return value;
 	}
 
 	@Override
 	public String toString() {
-		return "Token [name=" + name + ", value=" + value + "]";
+		return "Token [name=" + type + ", value=" + value + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
@@ -46,10 +62,10 @@ public class Token<E extends TokenDefinition<E>> {
 		if (getClass() != obj.getClass())
 			return false;
 		Token other = (Token) obj;
-		if (name == null) {
-			if (other.name != null)
+		if (type == null) {
+			if (other.type != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!type.equals(other.type))
 			return false;
 		if (value == null) {
 			if (other.value != null)
@@ -58,7 +74,5 @@ public class Token<E extends TokenDefinition<E>> {
 			return false;
 		return true;
 	}
-	
-	
-	
+
 }

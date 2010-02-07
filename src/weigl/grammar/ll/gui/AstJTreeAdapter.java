@@ -1,4 +1,4 @@
-package weigl.grammar.gui;
+package weigl.grammar.ll.gui;
 
 import java.util.LinkedList;
 
@@ -10,9 +10,9 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import weigl.grammar.rt.AST;
-import weigl.grammar.rt.AST.Leaf;
-import weigl.grammar.rt.AST.Node;
+import weigl.grammar.ll.rt.AST;
+import weigl.grammar.ll.rt.AST.Leaf;
+import weigl.grammar.ll.rt.AST.Node;
 
 /**
  * Decorator for an AST to an {@link TreeModel} for using in {@link JTree}.

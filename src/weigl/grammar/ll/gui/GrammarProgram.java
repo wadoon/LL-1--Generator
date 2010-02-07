@@ -1,4 +1,4 @@
-package weigl.grammar.gui;
+package weigl.grammar.ll.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,26 +14,27 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import weigl.grammar.GrammarParserException;
-import weigl.grammar.ParserWrapper;
-import weigl.grammar.ProductionGrammerParser;
+import weigl.grammar.ll.GrammarParserException;
+import weigl.grammar.ll.ParserWrapper;
+import weigl.grammar.ll.ProductionGrammerParser;
 import weigl.gui.LogListRenderer;
 import weigl.gui.LogListRenderer.Level;
 import weigl.gui.editor.EditorComponent;
 import weigl.gui.editor.EditorFrame;
+import weigl.gui.editor.EditorScrollPane;
 import weigl.gui.editor.EditorScrollPane.Highlight;
 
 /**
@@ -54,8 +55,8 @@ public class GrammarProgram extends JFrame {
 	public static final String GRAMMAR_EXPRESSION = "E: TZ\n" + "Z: +TZ|€\n"
 			+ "T: FX\n" + "X: *FX|€\n" + "F: (E)|I\n" + "I: aY|bY\n"
 			+ "Y: aY|bY|0Y|1Y|€\n";
-	
-	private JTextArea txtGrammar = new JTextArea(GRAMMAR_EXPRESSION);
+
+	private JEditorPane txtGrammar = new JEditorPane();
 	private EditorScrollPane editGrammar = new EditorScrollPane(txtGrammar);
 
 	private JButton btnCompile = new JButton("Compile");
@@ -74,17 +75,28 @@ public class GrammarProgram extends JFrame {
 
 	private JLabel lblLeafWord;
 
-	public final static String[] JAVA_KEYWORDS = { "if", "while", "private",
-			"public", "protected", "do", "void", "int", "double", "true",
-			"else", "\\{", "\\}", "final", "false", "boolean", "float", "long",
-			"for", "extends", "\\(", "\\)", "import", "package", "implements",
-			"return", "class", "new", "volatile", "transient", "try", "catch",
-			"throws", "throw" };
-
 	private static final String NAME = "LL(1)-Parsergenerator";
-	private static final String VERSION = "0.3";
+	private static final String VERSION = "0.4";
+
+	protected static final String[] JAVA_KEYWORDS = ("abstract	continue	for	new	switch"
+			+ "assert default goto	package	synchronized"
+			+ "boolean	do	if	private	this"
+			+ "break	double	implements	protected	throw"
+			+ "byte	else	import	public	throws"
+			+ "case	enum	instanceof	return	transient"
+			+ "catch	extends	int	short	try"
+			+ "char	final	interface	static	void"
+			+ "class	finally	long	strictfp	volatile"
+			+ "const	float	native	super	while").split("\\s");
 
 	public GrammarProgram() {
+		editGrammar.addHighlight(new Highlight(Color.LIGHT_GRAY, new String[] {
+				":", "€", "\\|" }));
+		editGrammar.addHighlight("([A-Z]+)", new Color(58, 9, 198));
+		editGrammar.addHighlight("([^A-Z ]+)", new Color(127, 1, 128));
+
+		txtGrammar.setText(GRAMMAR_EXPRESSION);
+
 		lookandfeel();
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout(5, 5));
@@ -102,7 +114,10 @@ public class GrammarProgram extends JFrame {
 
 		JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
-		txtGrammar.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
+		editGrammar.createDefault().setBackground(txtGrammar.getBackground())
+				.setForeground(txtGrammar.getForeground()).setFont(
+						Font.MONOSPACED, 22);
+		editGrammar.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
 
 		JPanel pWest = new JPanel(new BorderLayout());
 		JComponent p = createBorder(editGrammar, "Grammar Input:");
@@ -126,7 +141,7 @@ public class GrammarProgram extends JFrame {
 					EditorComponent ec = frame.getEditorComponent();
 
 					ec.setKeywords(JAVA_KEYWORDS);
-					ec.addHighlight(new Highlight(new Color(250, 200, 0, 160),
+					ec.addHighlight(new Highlight(new Color(127, 1, 128, 160),
 							JAVA_KEYWORDS));
 					frame.setSize(400, 400);
 					frame.setVisible(true);
@@ -284,10 +299,10 @@ public class GrammarProgram extends JFrame {
 			status("no parser was compiled", Level.WARNING);
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		GrammarProgram gp = new GrammarProgram();
-		gp.setTitle(NAME + " - "+VERSION);
+		gp.setTitle(NAME + " - " + VERSION);
 		gp.pack();
 		gp.setVisible(true);
 	}

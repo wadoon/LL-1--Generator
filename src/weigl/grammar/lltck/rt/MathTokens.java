@@ -24,4 +24,14 @@ public enum MathTokens implements TokenDefinition<MathTokens> {
 	public Pattern getPattern() {
 		return pattern;
 	}
+
+	@Override
+	public boolean isHidden() {
+		return false;
+	}
+
+	@Override
+	public boolean isRule() {
+		return false;
+	}
 }

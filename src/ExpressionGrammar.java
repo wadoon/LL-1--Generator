@@ -3,8 +3,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-import weigl.grammar.GrammarParserException;
-import weigl.grammar.ProductionGrammerParser;
+import weigl.grammar.ll.GrammarParserException;
+import weigl.grammar.ll.ProductionGrammerParser;
 
 
 public class ExpressionGrammar {

@@ -1,4 +1,4 @@
-import weigl.grammar.rt.*;
+import weigl.grammar.ll.rt.*;
 public class Parser extends ParserFather {
 
 	public static void main(String[] args) {

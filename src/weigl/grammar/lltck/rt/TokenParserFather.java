@@ -11,11 +11,11 @@ import weigl.std.NoMoreElementsException;
 public abstract class TokenParserFather<E extends TokenDefinition<E>> implements Parser<Token<E>> {
 	protected AST<Token<E>> syntaxTree;
 	private TokenDefinition<E> tokens[];
-	private Tokenizer<E> input;
+	protected Tokenizer<E> input;
 	private Token<E> curtok;
 
 	public TokenParserFather(TokenDefinition<E>... tokens) {
-		this.tokens = tokens;
+		this.setTokens(tokens);
 	}
 
 	/**
@@ -145,20 +145,21 @@ public abstract class TokenParserFather<E extends TokenDefinition<E>> implements
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void run(String source) {
-		reset();
-		input = new Tokenizer<E>(source, tokens);
-		consume();
-		syntaxTree = new DefaultAbstractSyntaxTree<Token<E>>(start());
-	}
+	public abstract void run(String source);
 
-	private void reset() {
-		syntaxTree = null;
-	}
+	public void reset() { syntaxTree = null; }
 
 	/** {@inheritDoc} */
 	@Override
 	public AST<Token<E>> getParseTree() {
 		return syntaxTree;
+	}
+
+	public void setTokens(TokenDefinition<E> tokens[]) {
+		this.tokens = tokens;
+	}
+
+	public TokenDefinition<E>[] getTokens() {
+		return tokens;
 	};
 }

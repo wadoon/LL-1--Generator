@@ -12,46 +12,48 @@ import freemarker.template.SimpleHash;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-public class TokenParserGenerator {
-	public static void main(String[] args) throws IOException,
-			TemplateException {
-		final String s = "string = \\w+\n"
-				+ "START: \"user: \" string | \"password: \" string\n";
-		TokenGrammarParser tgp = new TokenGrammarParser();
-		tgp.run(s);
-		SyntaxTree stx = new SyntaxTree(tgp.getParseTree());
-		List<SynToken> tokens = stx.getTokens();
-		List<SynRule> rules = stx.getRules();
-		FirstSetTokenCalculator fstc = new FirstSetTokenCalculator(rules);
+public class TokenParserGenerator
+{
+    public static void main(String[] args) throws IOException, TemplateException
+    {
+        final String s = "string = \\w+\n" + "$whitespaces = \\s+\n"
+                        + "START: \"user: \" string | \"password: \" string | START \n";
+        TokenGrammarParser tgp = new TokenGrammarParser();
+        tgp.run(s);
+        SyntaxTree stx = new SyntaxTree(tgp.getParseTree());
+        List<SynToken> tokens = stx.getTokens();
+        List<SynRule> rules = stx.getRules();
 
-		for (SynToken e : tokens) 
-			System.out.format("%-20s = %20s%n", e.name, e.regex);
+        // is this not an anti pattern?
+        new FirstSetTokenCalculator(rules);
 
-		for (SynRule e : rules) 
-		{
-			System.out.format("%-20s%n", e.name);
-			for (SynDerivation d : e.getDerivations()) 
-			{
-				System.out.format("\t%-20s%n", d.getTokenList().toString());
-				System.out.format("\t\t%20s%n", d.getFirstTokens().toString());
-			}
-		}
+        for (SynToken e : tokens)
+            System.out.format("%-20s = %20s%n", e.name, e.regex);
 
-		Configuration cfg = new Configuration();
-		cfg.setDirectoryForTemplateLoading(new File("."));
-		cfg.setObjectWrapper(DefaultObjectWrapper.DEFAULT_WRAPPER);
-		cfg.setDefaultEncoding("UTF-8");
+        for (SynRule e : rules)
+        {
+            System.out.format("%-20s%n", e.name);
+            for (SynDerivation d : e.getDerivations())
+            {
+                System.out.format("\t%-20s%n", d.getTokenList().toString());
+                System.out.format("\t\t%20s%n", d.getFirstTokens().toString());
+            }
+        }
 
-		Template tpl = cfg.getTemplate("Parser.ftl");
+        Configuration cfg = new Configuration();
+        cfg.setDirectoryForTemplateLoading(new File("."));
+        cfg.setObjectWrapper(DefaultObjectWrapper.DEFAULT_WRAPPER);
+        cfg.setDefaultEncoding("UTF-8");
 
-		SimpleHash rootMap = new SimpleHash();
-		rootMap.put("classname", "ParserTest");
-		rootMap.put("test", new SynRule("test"));
-		rootMap.put("tokens", tokens);
-		rootMap.put("rules", rules);
-		rootMap.put("firstSets", fstc.getFirstSets());
+        Template tpl = cfg.getTemplate("Parser.ftl");
 
-		tpl.process(rootMap, new FileWriter(
-				"src/weigl/grammar/lltck/ParserTest.java"));
-	}
+        SimpleHash rootMap = new SimpleHash();
+        rootMap.put("classname", "ParserTest");
+        rootMap.put("test", new SynRule("test"));
+        rootMap.put("tokens", tokens);
+        rootMap.put("rules", rules);
+        rootMap.put("input", s);
+
+        tpl.process(rootMap, new FileWriter("src/weigl/grammar/lltck/ParserTest.java"));
+    }
 }
