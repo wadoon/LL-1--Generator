@@ -19,7 +19,7 @@
 	<resources>
 		<java version="1.6+" />
 		<jar href="ll1parser.jar" main="true" />
-		<jar href="google-collect-1.0-rc4.jar"/>
+		<jar href="google-collect-1.0.jar"/>
 		<jar href="weigl_gui.jar" />
 		<jar href="weigl_tools.jar" />
 	</resources>

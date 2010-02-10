@@ -55,7 +55,7 @@ import com.google.common.collect.TreeMultimap;
 public class TokenGrammarParser
 {
     public static final String              UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    public static final String              LOWERCASE = "$"+UPPERCASE.toLowerCase();
+    public static final String              LOWERCASE = "$" + UPPERCASE.toLowerCase();
     public static final String              ANYCASE   = UPPERCASE + LOWERCASE + "\\+*-/[]{}: ";
 
     private Map<String, String>             tokenList = new TreeMap<String, String>();
@@ -72,7 +72,8 @@ public class TokenGrammarParser
     {
         for (String line : input.split("\\n"))
         {
-            if(line.trim().isEmpty())continue;
+            if (line.trim().isEmpty())
+                continue;
             final char first = line.charAt(0);
             if (LOWERCASE.indexOf(first) >= 0)
                 parseToken(line.trim());
@@ -92,8 +93,8 @@ public class TokenGrammarParser
     private void parseRule(String line)
     {
         String[] a = line.split(":", 2);
-        String name = a[0];
-        String derivatons = a[1];
+        String name = a[0].trim();
+        String derivatons = a[1].trim();
 
         for (String derivation : derivatons.split("(?<=[^\\\\])\\|"))
             addDerivation(name, derivation.trim());
@@ -101,12 +102,15 @@ public class TokenGrammarParser
 
     private void addDerivation(String name, String derivation)
     {
-        String toks[] = StringUtils.split(derivation, " \t\n", '"', '"' );
+        String toks[] = StringUtils.split(derivation, " \t\n", '"', '"');
         for (int i = 0; i < toks.length; i++)
         {
             toks[i] = toks[i].trim();
+
             if (toks[i].charAt(0) == '"')
+            {
                 toks[i] = quotedToToken(toks[i]);
+            }
 
         }
         ruleList.put(name, Array.create(toks));
@@ -133,7 +137,7 @@ public class TokenGrammarParser
     private String escapeRegex(String pattern)
     {
         // '-2' for removing leading and trailing parens
-        return Pattern.quote(pattern.substring(1, pattern.length() - 2));
+        return Pattern.quote(pattern.substring(1, pattern.length() - 1));
     }
 
     private void addToken(String name, String pattern)
@@ -158,8 +162,7 @@ public class TokenGrammarParser
     public List<SynRule> getRules()
     {
         List<SynRule> rules = new LinkedList<SynRule>();
-        for (Entry<String, Collection<Array<String>>> e 
-                        : ruleList.asMap().entrySet())
+        for (Entry<String, Collection<Array<String>>> e : ruleList.asMap().entrySet())
         {
             SynRule sr = new SynRule(e.getKey());
             StringBuilder doc = new StringBuilder();
@@ -182,15 +185,15 @@ public class TokenGrammarParser
 
         TokenGrammarParser p = new TokenGrammarParser(s);
         p.parse();
-        for (SynToken t: p.getTokens())
-            System.out.format("%20s = %-20s%n",t.getName(),t.getRegex());
-System.out.println("-----------------------------------------------");
-        for (SynRule t: p.getRules())
+        for (SynToken t : p.getTokens())
+            System.out.format("%20s = %-20s%n", t.getName(), t.getRegex());
+        System.out.println("-----------------------------------------------");
+        for (SynRule t : p.getRules())
         {
-            System.out.format("%20s%n",t.getName());
-            for (SynDerivation d: t.getDerivations())
+            System.out.format("%20s%n", t.getName());
+            for (SynDerivation d : t.getDerivations())
             {
-                System.out.format("\t\t%-20s%n",d.getTokenList().toString());
+                System.out.format("\t\t%-20s%n", d.getTokenList().toString());
             }
         }
     }

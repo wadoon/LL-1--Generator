@@ -1,6 +1,7 @@
 package weigl.grammar.gui;
 
 import java.util.LinkedList;
+
 import java.util.Stack;
 
 import java.util.List;
@@ -8,8 +9,6 @@ import java.util.List;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-
-import org.apache.commons.lang.NotImplementedException;
 
 import weigl.grammar.lltck.rt.TokenDefinition;
 import weigl.grammar.lltck.rt.interfaces.AST;
@@ -97,7 +96,7 @@ public class AstTokenJTreeAdapter<E extends TokenDefinition<E>> implements TreeM
     @Override
     public void valueForPathChanged(TreePath path, Object newValue)
     {
-        throw new NotImplementedException();
+        System.err.println("not implemented");
     }
 
 }

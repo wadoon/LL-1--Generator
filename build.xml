@@ -8,10 +8,9 @@
 	<property name="dist.dir" location="dist" />
 
 	<path id="classpath">
-		<pathelement location="lib/google-collect-1.0-rc4.jar" />
-		<pathelement location="lib/jxlayer.jar" />
-		<pathelement location="lib/weigl_gui.jar" />
-		<pathelement location="lib/weigl_tools.jar" />
+		<pathelement location="lib/google-collect-1.0.jar" />
+		<pathelement location="lib/freemarker.jar" />
+		<pathelement location="lib/weigl.jar" />
 	</path>
 
 	<target name="init">

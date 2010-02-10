@@ -111,7 +111,16 @@ public class Tokenizer<E extends TokenDefinition<E>> implements WIterator<Token<
             if (token.isRule())
                 continue;
             Matcher m = token.getPattern().matcher(input);
-            if (m.lookingAt())
+
+            
+            if(m.find())
+            {
+                System.out.println(token + " "+m.start()+ " " + input);
+                m.reset();
+            }
+            
+            
+            if (m.find() && m.start()==0)
             {
                 String matched = input.substring(0, m.end());
                 input = input.substring(m.end());
@@ -123,6 +132,13 @@ public class Tokenizer<E extends TokenDefinition<E>> implements WIterator<Token<
                         + ", position:" + inputPosition + "'");
     }
 
+    /**
+     * Wrapper for calling a function dynamically. <br>
+     * obj.TOKNAME(Token) : Token
+     * 
+     * @author Alexander Weigl <alexweigl@gmail.com>
+     * @date 2010-02-05
+     */
     public class TokenTypeCaller
     {
         private Object              obj;

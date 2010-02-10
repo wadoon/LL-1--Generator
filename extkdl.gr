@@ -1,0 +1,4 @@
+$whitespaces=\\s
+
+START: EXPR ";" START | EXPR | "if" EXPR "then" START "endif"  
+EXPR: "expr" 
