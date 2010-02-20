@@ -5,9 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/QT Jambi"/>
 	<classpathentry kind="lib" path="lib/freemarker.jar" sourcepath="/home/alex/usr/lib/java/freemarker/freemarker-2.3.16/src"/>
 	<classpathentry kind="lib" path="lib/google-collect-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/weigl_gui.jar"/>
-	<classpathentry kind="lib" path="lib/weigl_io.jar"/>
-	<classpathentry kind="lib" path="lib/weigl_tools.jar"/>
-	<classpathentry kind="lib" path="lib/weigl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/weigl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

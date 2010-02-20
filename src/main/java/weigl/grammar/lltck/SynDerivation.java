@@ -36,4 +36,9 @@ public class SynDerivation
     {
         return tokenList;
     }
+    
+    public boolean isEpsilon()
+    {
+	return tokenList.contains(GrammarAlgorithms.EPSILON);
+    }
 }

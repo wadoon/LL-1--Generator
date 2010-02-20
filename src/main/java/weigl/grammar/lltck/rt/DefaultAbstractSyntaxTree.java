@@ -146,6 +146,16 @@ public class DefaultAbstractSyntaxTree<E extends TokenDefinition<E>> implements 
         {
             return true;
         }
+
+	@Override
+	public Leaf<E> get(int i) {
+	    return childs.get(i);
+	}
+
+	@Override
+	public int size() {
+	    return childs.size();
+	}
     }
 
     public Node<E> getRoot()

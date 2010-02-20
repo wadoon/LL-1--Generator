@@ -115,7 +115,7 @@ public class Tokenizer<E extends TokenDefinition<E>> implements WIterator<Token<
             
             if(m.find())
             {
-                System.out.println(token + " "+m.start()+ " " + input);
+//                System.out.println(token + " "+m.start()+ " " + input);
                 m.reset();
             }
             

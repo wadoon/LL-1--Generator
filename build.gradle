@@ -1,0 +1,13 @@
+
+usePlugin 'java'
+
+dependencies {
+	compile  fileTree(dir: 'lib', includes: ['*.jar'])
+}
+
+sourceCompatibility = 1.6
+version = '1.0'
+manifest.mainAttributes(
+    'Implementation-Title': 'Parser (generator/runtime)',
+    'Implementation-Version': version
+)

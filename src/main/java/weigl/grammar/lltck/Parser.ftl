@@ -38,6 +38,13 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 		final Node<${tokenname}>  n = newNode( ${tokenname}.${rule.name} );	
 		boolean matched = false;
 		<#list rule.derivations as derivation>
+			<#if derivation.isEpsilon() >
+				<#t> if(true)
+				{
+					matched=true;
+					n.add(match(${tokenname}.EPSILON));
+				}
+			<#else>
 <#t>			if(lookahead(
 				<#list derivation.firstTokens as tok> ${tokenname}.${tok}<#t> 
 				<#if tok_has_next>,</#if></#list>))<#t>
@@ -51,19 +58,12 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 					</#if>
 				</#list>
 			}
+			</#if>
 			<#if derivation_has_next>else</#if>
 		</#list>
 		
-		<#if rule.isEpsilon()>
-		if(!matched)
-		{
-			matched=true;
-			n.add(newNode("€"));
-		}
-		<#else>
 		if(!matched)
 			error(/*...*/);
-		</#if>		
 		return ruleListener.${rule.name}(n);
 	}
 	</#list>
@@ -111,7 +111,7 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 	
 	public interface Token${classname}Callback {
 		<#list tokens as token> 
-		public Token<${tokenname}> ${token.name}( Token<${tokenname}> tok);
+		public Object ${token.name}( Token<${tokenname}> tok);
 		</#list>
 	}
 }
@@ -122,8 +122,9 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 //TOKEN ENUM;
 enum ${tokenname} implements TokenDefinition<${tokenname}>
 {
-	//tokens
-	<#list tokens as token> ${token.name}("${token.regex?j_string}", ${token.hidden?string}) ,</#list>
+	//tokens	
+<#t>  <#list tokens as token> ${token.name}("${token.regex?j_string}", ${token.hidden?string}) ,</#list>
+	EPSILON(true),	 
 	//rules
 	<#list rules as rule> ${rule.name}(true) <#if rule_has_next>,</#if> </#list>
 	;
