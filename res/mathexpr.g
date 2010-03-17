@@ -3,7 +3,8 @@ id       = [a-z]+
 constant = [A-Z]+
 func     = [a-z]+[(] 
 
-power = [^]plus  = [+]
+power = [^]
+plus  = [+]
 minus = [-]
 mult  = [*]
 div   = [/]
@@ -25,7 +26,7 @@ rp    = [)]
 	 	 
 	 
 START  :  PUNKT STRICH_  
-STRICH_ :  plus START | minus STRICH | €
+STRICH_ :  plus START | minus STRICH_ | €
 
 PUNKT   :  VALUE PUNKT_
 PUNKT_  :  div PUNKT | mult PUNKT | mod PUNKT  | €

@@ -1,20 +1,20 @@
-package weigl.grammar.lltck;
+package ${pgk};
 
 import java.util.regex.Pattern;
 import weigl.grammar.lltck.rt.*;
 import weigl.grammar.lltck.rt.interfaces.*;
 
-<#assign tokenname = "Token${classname}">
+
 /**
  *
  * generated Parser class for grammar:
  * <pre>${input}</pre>
  */ 
-public class ${classname} extends TokenParserFather<${tokenname}> {
+public class Parser${classname} extends TokenParserFather<${tokenname}> {
 	private Rule${classname}Callback ruleListener;
 	private Token${classname}Callback tokListener;	
 	
-	public ${classname}() {
+	public Parser${classname}() {
 		super(Token${classname}.values());
 		setRuleListener( new Rule${classname}CallbackAdapter() );
 	}
@@ -85,19 +85,12 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 	{
 		java.io.BufferedReader br = new java.io.BufferedReader(
 			new java.io.InputStreamReader(System.in));
-		${classname} parser = new ${classname}();
+		Parser${classname} parser = new Parser${classname}();
 		parser.run(br.readLine());
 		System.out.println(parser.getParseTree());
 	}
 	
 	
-	public static interface Rule${classname}Callback 
-	{
-		<#list rules as rule>
-		public Node<${tokenname}> ${rule.name}(Node<${tokenname}> node);
-		</#list>
-	}
-
 	public static class Rule${classname}CallbackAdapter implements Rule${classname}Callback 
 	{
 		<#list rules as rule>
@@ -108,48 +101,4 @@ public class ${classname} extends TokenParserFather<${tokenname}> {
 		}
 		</#list>
 	}
-	
-	public interface Token${classname}Callback {
-		<#list tokens as token> 
-		public Object ${token.name}( Token<${tokenname}> tok);
-		</#list>
-	}
-}
-
-
-
- 
-//TOKEN ENUM;
-enum ${tokenname} implements TokenDefinition<${tokenname}>
-{
-	//tokens	
-<#t>  <#list tokens as token> ${token.name}("${token.regex?j_string}", ${token.hidden?string}) ,</#list>
-	EPSILON(true),	 
-	//rules
-	<#list rules as rule> ${rule.name}(true) <#if rule_has_next>,</#if> </#list>
-	;
-	
-	private Pattern pattern;
-	private boolean hidden,rule;
-	private ${tokenname}(String regex)
-	{
-		pattern = Pattern.compile(regex);
-	}
-
-	private ${tokenname}(String regex, boolean h)
-	{
-		this(regex);
-		hidden = h;				
-	}
-
-	private ${tokenname}(boolean r )
-	{
-		this("",true);
-		rule = r;
-	}
-	
-	public Pattern getPattern() { return pattern;     }
-	public Token${classname} getType() { return this; }
-	public boolean isHidden() { return hidden;        }
-	public boolean isRule()   {		return rule;      }
 }

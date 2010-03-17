@@ -1,9 +1,7 @@
 package weigl.grammar.ll.rt;
 
 import java.util.ArrayList;
-
 import java.util.LinkedList;
-
 import java.util.List;
 
 import javax.swing.tree.TreePath;

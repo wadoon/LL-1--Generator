@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import weigl.std.StringUtils;
-
 /**
  * <h2>Left recursion</h2> tries to find all <b>direct</b> left recursion in the
  * grammar <h2>First Sets</h2> Calculates the first for each rule.
@@ -81,13 +79,18 @@ public class GrammarAlgorithms
 
         for (String s : value)
         {
-            if (StringUtils.isUpper(s))
+            if (isUpper(s))
             {
                 SynRule synRule = get(s);
                 
                 //hey, w've already calculated that!
-                if(synRule.getFirstSet()!=null) 
-                    return synRule.getFirstSet();
+//                if( synRule.getFirstSet() != null ) 
+//                     if( synRule.getFirstSet().contains(EPSILON))
+//                	 firstTokens.addAll(synRule.getFirstSet());
+//                     else
+//                	 return synRule.getFirstSet();
+                
+                System.out.println(synRule);
                 
                 for (SynDerivation e : synRule.getDerivations())
                     firstTokens.addAll(calculateFirstSet(e.tokenList));
@@ -105,6 +108,10 @@ public class GrammarAlgorithms
         }
         firstTokens.add(EPSILON);
         return firstTokens;
+    }
+
+    private boolean isUpper(String s) {
+	return Character.isUpperCase( s.charAt(0) );
     }
 
     /**

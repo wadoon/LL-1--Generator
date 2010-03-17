@@ -1,6 +1,8 @@
 package weigl.grammar.lltck.rt;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import weigl.grammar.lltck.rt.interfaces.AST;
 import weigl.tools.compiler.OnTheFlyCompiler;
@@ -15,10 +17,10 @@ public class TokenParserWrapper implements Parser
 {
     private Parser<?> parser;
 
-    public TokenParserWrapper(String javaSource, String clazzName, String[] secondary) throws IOException, InstantiationException, IllegalAccessException
+    public TokenParserWrapper(Map<File, String> sources, String primaryClazzName) throws IOException, InstantiationException, IllegalAccessException
     {
         OnTheFlyCompiler otlExecutor = new OnTheFlyCompiler();
-        Class<?> clazz = otlExecutor.compile(javaSource, clazzName,secondary);
+        Class<?> clazz = otlExecutor.compile(sources, primaryClazzName);
         parser = TokenParserFather.class.cast(clazz.newInstance());
     }
 

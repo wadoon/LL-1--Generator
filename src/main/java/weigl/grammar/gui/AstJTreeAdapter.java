@@ -1,7 +1,6 @@
 package weigl.grammar.gui;
 
 import java.util.LinkedList;
-
 import java.util.List;
 import java.util.Stack;
 

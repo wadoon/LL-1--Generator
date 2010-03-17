@@ -1,10 +1,8 @@
 package weigl.grammar.gui;
 
 import java.util.LinkedList;
-
-import java.util.Stack;
-
 import java.util.List;
+import java.util.Stack;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;

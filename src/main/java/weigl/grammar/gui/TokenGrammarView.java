@@ -8,6 +8,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.io.File;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -74,240 +77,251 @@ public class TokenGrammarView extends JFrame {
     private static final String VERSION = "0.1";
 
     protected static final String[] JAVA_KEYWORDS = ("abstract  continue    for new switch"
-            + "assert default goto  package synchronized"
-            + "boolean  do  if  private this"
-            + "break    double  implements  protected   throw"
-            + "byte else    import  public  throws"
-            + "case enum    instanceof  return  transient"
-            + "catch    extends int short   try"
-            + "char final   interface   static  void"
-            + "class    finally long    strictfp    volatile"
-            + "const    float   native  super   while").split("\\s");
+	    + "assert default goto  package synchronized"
+	    + "boolean  do  if  private this"
+	    + "break    double  implements  protected   throw"
+	    + "byte else    import  public  throws"
+	    + "case enum    instanceof  return  transient"
+	    + "catch    extends int short   try"
+	    + "char final   interface   static  void"
+	    + "class    finally long    strictfp    volatile"
+	    + "const    float   native  super   while").split("\\s");
+
+    private static final String CLAZZ_NAME = null;
+
+    private static final String[] CLASSES_NAMES = null;
+
+    private static final String CONANCIAL_NAME = null;
 
     public TokenGrammarView() {
-        editGrammar.addHighlight(new Highlight(Color.RED, new String[] {
-                "[:]", "=","[$]", "€", "(?<=[^\\\\])\\|" }));
-        
-        editGrammar.addHighlight("([A-Z]+)", new Color(128, 127, 200));
-        editGrammar.addHighlight("([a-z]+)", new Color(200, 127, 128));
-        editGrammar.addHighlight("(\"\\w*\")", new Color(127, 200 ,128));
+	editGrammar.addHighlight(new Highlight(Color.RED, new String[] { "[:]",
+		"=", "[$]", "€", "(?<=[^\\\\])\\|" }));
 
-        txtGrammar.setText(GRAMMAR_EXPRESSION);
+	editGrammar.addHighlight("([A-Z]+)", new Color(128, 127, 200));
+	editGrammar.addHighlight("([a-z]+)", new Color(200, 127, 128));
+	editGrammar.addHighlight("(\"\\w*\")", new Color(127, 200, 128));
 
-        lookandfeel();
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(5, 5));
+	txtGrammar.setText(GRAMMAR_EXPRESSION);
 
-        LogListRenderer.install(lstLoggingModel);
-        lstLogging.setCellRenderer(new LogListRenderer());
+	lookandfeel();
+	setDefaultCloseOperation(EXIT_ON_CLOSE);
+	setLayout(new BorderLayout(5, 5));
 
-        scrLogging.getVerticalScrollBar().addAdjustmentListener(
-                new AdjustmentListener() {
-                    public void adjustmentValueChanged(AdjustmentEvent e) {
-                        e.getAdjustable().setValue(
-                                e.getAdjustable().getMaximum());
-                    }
-                });
+	LogListRenderer.install(lstLoggingModel);
+	lstLogging.setCellRenderer(new LogListRenderer());
 
-        JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+	scrLogging.getVerticalScrollBar().addAdjustmentListener(
+		new AdjustmentListener() {
+		    public void adjustmentValueChanged(AdjustmentEvent e) {
+			e.getAdjustable().setValue(
+				e.getAdjustable().getMaximum());
+		    }
+		});
 
-//        editGrammar.createDefault().setBackground(txtGrammar.getBackground())
-//                .setForeground(txtGrammar.getForeground()).setFont(
-//                        Font.MONOSPACED, 22);
-//        editGrammar.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
+	JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 
-        JPanel pWest = new JPanel(new BorderLayout());
-        JComponent p = createBorder(editGrammar, "Grammar Input:");
+	// editGrammar.createDefault().setBackground(txtGrammar.getBackground())
+	// .setForeground(txtGrammar.getForeground()).setFont(
+	// Font.MONOSPACED, 22);
+	// editGrammar.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 22));
 
-        JPanel pWestSouth = new JPanel(new GridLayout(1, 2, 10, 10));
-        pWestSouth.add(btnJavaSource);
-        pWestSouth.add(btnCompile);
-        pWest.add(p);
-        pWest.add(pWestSouth, BorderLayout.SOUTH);
+	JPanel pWest = new JPanel(new BorderLayout());
+	JComponent p = createBorder(editGrammar, "Grammar Input:");
 
-        split.setLeftComponent(pWest);
+	JPanel pWestSouth = new JPanel(new GridLayout(1, 2, 10, 10));
+	pWestSouth.add(btnJavaSource);
+	pWestSouth.add(btnCompile);
+	pWest.add(p);
+	pWest.add(pWestSouth, BorderLayout.SOUTH);
 
-        btnJavaSource.addActionListener(new ActionListener() {
+	split.setLeftComponent(pWest);
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    String s = createJavaSource();
-                    EditorFrame frame = new EditorFrame(s);
-                    EditorComponent ec = frame.getEditorComponent();
+	btnJavaSource.addActionListener(new ActionListener() {
 
-                    ec.setKeywords(JAVA_KEYWORDS);
-                    ec.addHighlight(new Highlight(new Color(127, 1, 128, 160),
-                            JAVA_KEYWORDS));
-                    frame.setSize(400, 400);
-                    frame.setVisible(true);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-        });
+	    @Override
+	    public void actionPerformed(ActionEvent e1) {
+		try {
+		    Map<File, String> s = createJavaSource();
+		    StringBuilder sb = new StringBuilder(4096);
+		    for (Entry<File, String> e : s.entrySet()) 
+			sb.append("//").append(e.getKey()).append("\n\n")
+				.append(e.getValue());
+		    
+		    EditorFrame frame = new EditorFrame(sb.toString());
+		    EditorComponent ec = frame.getEditorComponent();
 
-        btnCompile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                compile();
-            }
-        });
+		    ec.setKeywords(JAVA_KEYWORDS);
+		    ec.addHighlight(new Highlight(new Color(127, 1, 128, 160),
+			    JAVA_KEYWORDS));
+		    frame.setSize(400, 400);
+		    frame.setVisible(true);
+		} catch (Exception e8) {
+		    e8.printStackTrace();
+		}
+	    }
+	});
 
-        txtInput = new JTextField(20);
+	btnCompile.addActionListener(new ActionListener() {
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		compile();
+	    }
+	});
 
-        lblLeafWord = new JLabel("");
+	txtInput = new JTextField(20);
 
-        JPanel center = new JPanel(new BorderLayout(10, 10));
-        JPanel pinput = new JPanel(new BorderLayout());
+	lblLeafWord = new JLabel("");
 
-        pinput.add(createGrid(lblInput, new JLabel("Leaf word:")),
-                BorderLayout.WEST);
-        pinput.add(createGrid(txtInput, lblLeafWord), BorderLayout.CENTER);
+	JPanel center = new JPanel(new BorderLayout(10, 10));
+	JPanel pinput = new JPanel(new BorderLayout());
 
-        pinput.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	pinput.add(createGrid(lblInput, new JLabel("Leaf word:")),
+		BorderLayout.WEST);
+	pinput.add(createGrid(txtInput, lblLeafWord), BorderLayout.CENTER);
 
-        txtInput.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                change(e);
-            }
+	pinput.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                change(e);
-            }
+	txtInput.getDocument().addDocumentListener(new DocumentListener() {
+	    @Override
+	    public void removeUpdate(DocumentEvent e) {
+		change(e);
+	    }
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                change(e);
-            }
+	    @Override
+	    public void insertUpdate(DocumentEvent e) {
+		change(e);
+	    }
 
-            private void change(DocumentEvent e) {
-                checkInput(txtInput.getText());
-            }
-        });
+	    @Override
+	    public void changedUpdate(DocumentEvent e) {
+		change(e);
+	    }
 
-        center.add(pinput, BorderLayout.NORTH);
-        center.add(createBorder(new JScrollPane(treeParse), "Parse Tree"));
-        split.setRightComponent(center);
+	    private void change(DocumentEvent e) {
+		checkInput(txtInput.getText());
+	    }
+	});
 
-        add(createBorder(scrLogging, "Logging"), BorderLayout.SOUTH);
-        add(split, BorderLayout.CENTER);
+	center.add(pinput, BorderLayout.NORTH);
+	center.add(createBorder(new JScrollPane(treeParse), "Parse Tree"));
+	split.setRightComponent(center);
 
-        status("Welcome to another LL(1)-Parser factory");
-        status("Alexander Weigl <weigla@fh-trier.de> -- Dezember 2009");
-        status("Creates parser generators after the script in theoretical computer science!");
+	add(createBorder(scrLogging, "Logging"), BorderLayout.SOUTH);
+	add(split, BorderLayout.CENTER);
+
+	status("Welcome to another LL(1)-Parser factory");
+	status("Alexander Weigl <weigla@fh-trier.de> -- Dezember 2009");
+	status("Creates parser generators after the script in theoretical computer science!");
     }
 
     private void lookandfeel() {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            // UIManager
+	try {
+	    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	    // UIManager
 
-            // .setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+	    // .setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
     }
 
     private Component createGrid(JComponent... c) {
-        JPanel p = new JPanel(new GridLayout(0, 1));
-        for (JComponent j : c)
-            p.add(j);
-        return p;
+	JPanel p = new JPanel(new GridLayout(0, 1));
+	for (JComponent j : c)
+	    p.add(j);
+	return p;
     }
 
     public void success(JComponent c) {
-        c.setBackground(SUCCESS);
+	c.setBackground(SUCCESS);
     }
 
     public void error(JComponent c) {
-        c.setBackground(ERROR);
+	c.setBackground(ERROR);
     }
 
     public void status(String line) {
-        status(line, Level.INFO);
+	status(line, Level.INFO);
     }
 
     public void status(String line, Level level) {
-        lstLoggingModel.addElement(LogListRenderer.createMessage(line, level));
-        scrLogging.getVerticalScrollBar().setValue(
-                scrLogging.getVerticalScrollBar().getMaximum());
+	lstLoggingModel.addElement(LogListRenderer.createMessage(line, level));
+	scrLogging.getVerticalScrollBar().setValue(
+		scrLogging.getVerticalScrollBar().getMaximum());
     }
 
     public void generateSource() {
-        try {
-            createJavaSource();
-            success(editGrammar);
-            status("source generator ran successfully");
-        } catch (Exception e) {
-            status("source generator: " + e.getMessage());
-            error(editGrammar);
-        }
+	try {
+	    createJavaSource();
+	    success(editGrammar);
+	    status("source generator ran successfully");
+	} catch (Exception e) {
+	    status("source generator: " + e.getMessage());
+	    error(editGrammar);
+	}
     }
 
-    private String createJavaSource() throws LeftRecursionException, RuleUnknownException
-    {
-        TokenParserGenerator tgp = new TokenParserGenerator(txtGrammar.getText());
-        String javaSource = tgp.getJavaSource();
-        return javaSource;
+    private Map<File, String> createJavaSource() throws LeftRecursionException,
+	    RuleUnknownException {
+	TokenParserGenerator tgp = new TokenParserGenerator(txtGrammar
+		.getText());
+	Map<File, String> javaSource = tgp.getJavaSource(
+		"weigls.grammar.lltck", CLAZZ_NAME);
+	return javaSource;
     }
 
     public void compile() {
-        status("Compiling...");
-        try {
-            String s = createJavaSource();
-            parser = new TokenParserWrapper(s,
-                             TokenParserGenerator.CONANCIAL_NAME,
-                             TokenParserGenerator.CLASSES_NAMES
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            status("error at compiling  " + e.getMessage());
-        }
+	status("Compiling...");
+	try {
+	    Map<File, String> s = createJavaSource();
+	    parser = new TokenParserWrapper(s, CONANCIAL_NAME);
+	} catch (Exception e) {
+	    e.printStackTrace();
+	    status("error at compiling  " + e.getMessage());
+	}
     }
 
     private JComponent createBorder(JComponent c, String title) {
-        JPanel pane = new JPanel(new BorderLayout());
-        pane.add(c);
-        pane.setBorder(BorderFactory.createTitledBorder(title));
-        return pane;
+	JPanel pane = new JPanel(new BorderLayout());
+	pane.add(c);
+	pane.setBorder(BorderFactory.createTitledBorder(title));
+	return pane;
     }
 
     @SuppressWarnings("unchecked")
     public void checkInput(String input) {
-        if (parser != null) {
-            try {
-                parser.run(input);
-                treeParse.setModel(new AstTokenJTreeAdapter(parser.getParseTree()));
-                String leafWord = parser.getParseTree().getLeafWord();
-                lblLeafWord.setText(leafWord);
+	if (parser != null) {
+	    try {
+		parser.run(input);
+		treeParse.setModel(new AstTokenJTreeAdapter(parser
+			.getParseTree()));
+		String leafWord = parser.getParseTree().getLeafWord();
+		lblLeafWord.setText(leafWord);
 
-                if (leafWord.equals(input)) {
-                    success(txtInput);
-                    status("word match!", Level.SUCCESS);
-                } else {
-                    error(txtInput);
-                    status("word mismatch!", Level.ERROR);
-                }
-            } catch (IllegalStateException e) {
-                status("Input string is not well-known for the given grammar",
-                        Level.ERROR);
-                status(e.getMessage(), Level.ERROR);
-                error(txtInput);
-                treeParse.setModel(null);
-            }
-        } else {
-            error(txtInput);
-            status("no parser was compiled", Level.WARNING);
-        }
+		if (leafWord.equals(input)) {
+		    success(txtInput);
+		    status("word match!", Level.SUCCESS);
+		} else {
+		    error(txtInput);
+		    status("word mismatch!", Level.ERROR);
+		}
+	    } catch (IllegalStateException e) {
+		status("Input string is not well-known for the given grammar",
+			Level.ERROR);
+		status(e.getMessage(), Level.ERROR);
+		error(txtInput);
+		treeParse.setModel(null);
+	    }
+	} else {
+	    error(txtInput);
+	    status("no parser was compiled", Level.WARNING);
+	}
     }
 
     public static void main(String[] args) {
-        TokenGrammarView gp = new TokenGrammarView();
-        gp.setTitle(NAME + " - " + VERSION);
-        gp.pack();
-        gp.setVisible(true);
+	TokenGrammarView gp = new TokenGrammarView();
+	gp.setTitle(NAME + " - " + VERSION);
+	gp.pack();
+	gp.setVisible(true);
     }
 }

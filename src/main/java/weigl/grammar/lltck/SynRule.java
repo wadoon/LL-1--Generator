@@ -98,4 +98,11 @@ public class SynRule
     {
         return firstSet;
     }
+
+    @Override
+    public String toString() {
+	return "SynRule [name=" + name + ", derivation=" + derivation + " ]";
+    }
+    
+    
 }
